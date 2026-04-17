@@ -1,0 +1,223 @@
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { auth, db } from '../../firebase';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import { useAppContext } from '../../context/AppContext';
+import { Eye, EyeOff, CheckCircle2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+const Login = () => {
+  const navigate = useNavigate();
+  const { forceAdminLogin } = useAppContext();
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [successMode, setSuccessMode] = useState(false); // New Success State
+  
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [name, setName] = useState('');
+  
+  const [degree, setDegree] = useState('B.Tech Computer Science');
+  const [year, setYear] = useState('3rd Year');
+  const [primaryLanguage, setPrimaryLanguage] = useState('Python');
+  const [careerGoal, setCareerGoal] = useState('Full Stack Developer');
+  const [weakness, setWeakness] = useState('Data Structures & Algorithms');
+  const [targetCompany, setTargetCompany] = useState('Product Based (FAANG/Top Tech)');
+
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    try {
+      if (!isSignUp && email.toLowerCase() === 'admin@gmail.com' && (password === 'admin' || password === 'admin@123')) {
+        forceAdminLogin();
+        navigate('/dashboard');
+        return;
+      }
+
+      if (isSignUp) {
+        // 1. Create Base User
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // 2. Update Auth Profile
+        await updateProfile(user, { displayName: name || 'User' });
+
+        // 3. Save to Database (With independent error catch so it doesn't hang UI if Firestore fails due to rules)
+        try {
+          await setDoc(doc(db, "users", user.uid), {
+            name: name || 'User',
+            email: user.email,
+            role: 'student', 
+            profile: { degree, year, primaryLanguage, careerGoal, weakness, targetCompany },
+            createdAt: new Date().toISOString()
+          });
+        } catch (dbError) {
+          console.error("Firestore DB Save Error (Check your Firebase DB Rules!):", dbError);
+          // We don't fail the registration if only the DB save failed due to rules missing
+        }
+
+        // Show Success UI instead of logging in instantly
+        setSuccessMode(true);
+        setLoading(false);
+        return; 
+      } else {
+        // Sign In
+        await signInWithEmailAndPassword(auth, email, password);
+        navigate('/dashboard');
+      }
+
+    } catch (err) {
+      console.error(err);
+      let errorMessage = "An error occurred during process.";
+      if (err.code === 'auth/email-already-in-use') errorMessage = "That email is already registered! Please sign in.";
+      if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') errorMessage = "Invalid email or password.";
+      if (err.code === 'auth/weak-password') errorMessage = "Password should be at least 6 characters.";
+      setError(errorMessage);
+    } finally {
+      if (!successMode) setLoading(false);
+    }
+  };
+
+  // SUCCESS VIEW
+  if (successMode) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="glass-panel" style={{ width: '100%', maxWidth: '450px', padding: '3rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
+          <CheckCircle2 size={64} className="text-gradient" />
+          <h2 className="heading-md">Registration Successful!</h2>
+          <p className="text-body">Your AI career profile has been created successfully. You can now login with your credentials.</p>
+          <button onClick={() => { setSuccessMode(false); setIsSignUp(false); setPassword(''); }} className="btn-primary" style={{ width: '100%', marginTop: '1rem' }}>
+            Go to Login
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // STANDARD FORM VIEW
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem 0' }}>
+      
+      <Link to="/" style={{ position: 'absolute', top: '2rem', left: '2rem', color: 'var(--text-secondary)', textDecoration: 'none', fontWeight: 600 }}>
+        &larr; Back to Home
+      </Link>
+
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-panel" style={{ width: '100%', maxWidth: '550px', padding: '2.5rem 3rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', maxHeight: '90vh', overflowY: 'auto' }}>
+        
+        <div style={{ display: 'flex', background: 'rgba(0,0,0,0.05)', borderRadius: 'var(--radius-sm)', padding: '0.25rem' }}>
+          <button 
+             type="button"
+             onClick={() => { setIsSignUp(false); setError(null); }}
+             style={{ flex: 1, padding: '0.75rem', border: 'none', borderRadius: 'var(--radius-sm)', background: !isSignUp ? 'var(--panel-bg)' : 'transparent', color: !isSignUp ? 'var(--text-primary)' : 'var(--text-secondary)', fontWeight: 600, cursor: 'pointer', boxShadow: !isSignUp ? '0 4px 10px rgba(0,0,0,0.05)' : 'none' }}
+          >
+            Sign In
+          </button>
+          <button 
+             type="button"
+             onClick={() => { setIsSignUp(true); setError(null); }}
+             style={{ flex: 1, padding: '0.75rem', border: 'none', borderRadius: 'var(--radius-sm)', background: isSignUp ? 'var(--panel-bg)' : 'transparent', color: isSignUp ? 'var(--text-primary)' : 'var(--text-secondary)', fontWeight: 600, cursor: 'pointer', boxShadow: isSignUp ? '0 4px 10px rgba(0,0,0,0.05)' : 'none' }}
+          >
+            Register
+          </button>
+        </div>
+
+        <div style={{ textAlign: 'center' }}>
+          <h2 className="heading-md">{isSignUp ? 'User Registration' : 'Welcome Back'}</h2>
+        </div>
+
+        {error && (
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} style={{ background: 'rgba(244, 63, 94, 0.1)', border: '1px solid rgba(244, 63, 94, 0.2)', color: 'var(--danger)', padding: '1rem', borderRadius: 'var(--radius-sm)', fontSize: '0.9rem', textAlign: 'center', fontWeight: '500' }}>
+            {error}
+          </motion.div>
+        )}
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          
+          {isSignUp && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', paddingBottom: '1rem', borderBottom: '1px solid var(--panel-border)' }}>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                <span className="text-body" style={{ fontSize: '0.85rem' }}>Full Name</span>
+                <input type="text" placeholder="John Doe" required value={name} onChange={(e) => setName(e.target.value)} style={{ width: '100%', padding: '0.875rem 1rem', borderRadius: 'var(--radius-md)', outline: 'none', background: 'var(--panel-bg)', color: 'var(--text-primary)', border: '1px solid var(--panel-border)' }} />
+              </div>
+              
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                  <span className="text-body" style={{ fontSize: '0.85rem' }}>Degree</span>
+                  <select value={degree} onChange={(e) => setDegree(e.target.value)} style={{ width: '100%', padding: '0.875rem 0.5rem', borderRadius: 'var(--radius-md)', outline: 'none', background: 'var(--panel-bg)', color: 'var(--text-primary)', border: '1px solid var(--panel-border)', fontSize: '0.9rem', minWidth: '0' }}>
+                    <option value="B.Tech Computer Science">B.Tech CS</option>
+                    <option value="B.Tech IT">B.Tech IT</option>
+                    <option value="BCA">BCA</option>
+                    <option value="MCA">MCA</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                  <span className="text-body" style={{ fontSize: '0.85rem' }}>Year</span>
+                  <select value={year} onChange={(e) => setYear(e.target.value)} style={{ width: '100%', padding: '0.875rem 0.5rem', borderRadius: 'var(--radius-md)', outline: 'none', background: 'var(--panel-bg)', color: 'var(--text-primary)', border: '1px solid var(--panel-border)', fontSize: '0.9rem', minWidth: '0' }}>
+                    <option value="1st Year">1st Year</option>
+                    <option value="2nd Year">2nd Year</option>
+                    <option value="3rd Year">3rd Year</option>
+                    <option value="4th Year">4th Year</option>
+                    <option value="Graduated">Graduated</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                <span className="text-body" style={{ fontSize: '0.85rem' }}>Primary Language</span>
+                <select value={primaryLanguage} onChange={(e) => setPrimaryLanguage(e.target.value)} style={{ width: '100%', padding: '0.875rem 1rem', borderRadius: 'var(--radius-md)', outline: 'none', background: 'var(--panel-bg)', color: 'var(--text-primary)', border: '1px solid var(--panel-border)' }}>
+                  <option value="Python">Python</option>
+                  <option value="Java">Java</option>
+                  <option value="C++">C++</option>
+                  <option value="JavaScript">JS</option>
+                </select>
+              </div>
+
+            </div>
+          )}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+             <span className="text-body" style={{ fontSize: '0.85rem' }}>Email Address</span>
+             <input type="email" placeholder="user@university.edu" required value={email} onChange={(e) => setEmail(e.target.value)} style={{ width: '100%', padding: '0.875rem 1rem', borderRadius: 'var(--radius-md)', outline: 'none', background: 'var(--panel-bg)', color: 'var(--text-primary)', border: '1px solid var(--panel-border)' }} />
+          </div>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+             <span className="text-body" style={{ fontSize: '0.85rem' }}>Password</span>
+             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+               <input 
+                 type={showPassword ? "text" : "password"} 
+                 placeholder="Min 6 characters" 
+                 required 
+                 value={password} 
+                 onChange={(e) => setPassword(e.target.value)} 
+                 style={{ width: '100%', padding: '0.875rem 3rem 0.875rem 1rem', borderRadius: 'var(--radius-md)', outline: 'none', background: 'var(--panel-bg)', color: 'var(--text-primary)', border: '1px solid var(--panel-border)' }} 
+               />
+               <button 
+                 type="button"
+                 onClick={() => setShowPassword(!showPassword)}
+                 style={{ position: 'absolute', right: '1rem', background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+               >
+                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+               </button>
+             </div>
+          </div>
+
+          <button type="submit" className="btn-primary" disabled={loading} style={{ marginTop: '0.5rem', opacity: loading ? 0.7 : 1 }}>
+            {loading ? 'Processing...' : (isSignUp ? 'Create User Profile' : 'Login Securely')}
+          </button>
+
+        </form>
+
+      </motion.div>
+    </div>
+  );
+};
+
+export default Login;
