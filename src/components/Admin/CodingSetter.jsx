@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { db } from '../../firebase';
 import { doc, setDoc } from 'firebase/firestore';
-import { Database, PlusCircle, CheckCircle2 } from 'lucide-react';
+import { Database, PlusCircle, CheckCircle2, Trash2 } from 'lucide-react';
 
 const CodingSetter = () => {
   const [title, setTitle] = useState('');
@@ -12,16 +12,41 @@ const CodingSetter = () => {
   const [publicInput, setPublicInput] = useState('');
   const [publicOutput, setPublicOutput] = useState('');
   
-  const [hiddenInput, setHiddenInput] = useState('');
-  const [hiddenOutput, setHiddenOutput] = useState('');
+  const [hiddenCases, setHiddenCases] = useState([{ input: '', output: '' }]);
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  const addHiddenCase = () => {
+    setHiddenCases([...hiddenCases, { input: '', output: '' }]);
+  };
+
+  const removeHiddenCase = (index) => {
+    if (hiddenCases.length === 1) {
+      setHiddenCases([{ input: '', output: '' }]);
+      return;
+    }
+    setHiddenCases(hiddenCases.filter((_, i) => i !== index));
+  };
+
+  const updateHiddenCase = (index, field, value) => {
+    const updated = [...hiddenCases];
+    updated[index][field] = value;
+    setHiddenCases(updated);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setSuccess(false);
+
+    // Filter out empty hidden cases
+    const validHiddenCases = hiddenCases.filter(c => c.input.trim() !== '' && c.output.trim() !== '');
+    if (validHiddenCases.length === 0) {
+      alert("Please provide at least one complete hidden test case.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const qId = `q_custom_${Date.now()}`;
@@ -31,12 +56,16 @@ const CodingSetter = () => {
         category,
         description,
         publicCases: [{ input: publicInput, output: publicOutput }],
-        hiddenCases: [{ input: hiddenInput, output: hiddenOutput }],
+        hiddenCases: validHiddenCases,
         createdAt: new Date().toISOString()
       });
       
       setSuccess(true);
-      setTitle(''); setDescription(''); setPublicInput(''); setPublicOutput(''); setHiddenInput(''); setHiddenOutput('');
+      setTitle(''); 
+      setDescription(''); 
+      setPublicInput(''); 
+      setPublicOutput(''); 
+      setHiddenCases([{ input: '', output: '' }]);
     } catch (err) {
       console.error(err);
       alert("Failed to save problem to Database.");
@@ -86,18 +115,62 @@ const CodingSetter = () => {
           <textarea required value={description} onChange={e => setDescription(e.target.value)} rows={4} style={{ padding: '0.875rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--panel-border)', background: 'var(--bg-color)', color: 'var(--text-primary)', resize: 'vertical' }} placeholder="Explain the problem scenario..." />
         </div>
 
+        {/* Public Test Case */}
         <div style={{ display: 'flex', gap: '2rem', padding: '1.5rem', background: 'rgba(0,0,0,0.02)', border: '1px dashed var(--panel-border)', borderRadius: 'var(--radius-md)' }}>
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <h4 style={{ color: 'var(--text-primary)', fontWeight: 700 }}>Public Test Case</h4>
-            <input required value={publicInput} onChange={e => setPublicInput(e.target.value)} placeholder="Input (e.g. nums=[1,2])" style={{ padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--panel-border)' }} />
-            <input required value={publicOutput} onChange={e => setPublicOutput(e.target.value)} placeholder="Expected Output (e.g. 3)" style={{ padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--panel-border)' }} />
+            <input required value={publicInput} onChange={e => setPublicInput(e.target.value)} placeholder="Input (e.g. nums=[1,2])" style={{ padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--panel-border)', background: 'var(--bg-color)', color: 'var(--text-primary)' }} />
+            <input required value={publicOutput} onChange={e => setPublicOutput(e.target.value)} placeholder="Expected Output (e.g. 3)" style={{ padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--panel-border)', background: 'var(--bg-color)', color: 'var(--text-primary)' }} />
+          </div>
+        </div>
+
+        {/* Hidden Test Cases (Gemini Graded) */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1.5rem', background: 'rgba(244, 63, 94, 0.03)', border: '1px dashed rgba(244, 63, 94, 0.3)', borderRadius: 'var(--radius-md)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h4 style={{ color: 'var(--danger)', fontWeight: 700 }}>Hidden Test Cases (Gemini Graded)</h4>
+            <button 
+              type="button"
+              onClick={addHiddenCase}
+              style={{ 
+                padding: '0.5rem 1rem', background: 'rgba(244, 63, 94, 0.1)', border: '1px solid var(--danger)', 
+                borderRadius: 'var(--radius-sm)', color: 'var(--danger)', cursor: 'pointer', 
+                display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', fontWeight: 600 
+              }}
+            >
+              <PlusCircle size={16} /> Add Hidden Case
+            </button>
           </div>
           
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <h4 style={{ color: 'var(--danger)', fontWeight: 700 }}>Hidden Test Case (Gemini Graded)</h4>
-            <input required value={hiddenInput} onChange={e => setHiddenInput(e.target.value)} placeholder="Edge Case Input" style={{ padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--panel-border)' }} />
-            <input required value={hiddenOutput} onChange={e => setHiddenOutput(e.target.value)} placeholder="Expected Edge Output" style={{ padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--panel-border)' }} />
-          </div>
+          {hiddenCases.map((hc, idx) => (
+            <div key={idx} style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <input 
+                  value={hc.input} 
+                  onChange={e => updateHiddenCase(idx, 'input', e.target.value)} 
+                  placeholder={`Hidden Input ${idx + 1}`} 
+                  style={{ padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--panel-border)', background: 'var(--bg-color)', color: 'var(--text-primary)' }} 
+                />
+                <input 
+                  value={hc.output} 
+                  onChange={e => updateHiddenCase(idx, 'output', e.target.value)} 
+                  placeholder={`Expected Output ${idx + 1}`} 
+                  style={{ padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--panel-border)', background: 'var(--bg-color)', color: 'var(--text-primary)' }} 
+                />
+              </div>
+              <button 
+                type="button"
+                onClick={() => removeHiddenCase(idx)}
+                style={{ 
+                  padding: '0.75rem', background: 'rgba(244, 63, 94, 0.1)', border: 'none', 
+                  borderRadius: 'var(--radius-sm)', color: 'var(--danger)', cursor: 'pointer', display: 'flex', alignItems: 'center' 
+                }}
+                title="Remove Hidden Case"
+              >
+                <Trash2 size={18} />
+              </button>
+            </div>
+          ))}
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>* At least one hidden test case with both input and output is required.</p>
         </div>
 
         <button type="submit" disabled={loading} className="btn-primary" style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', opacity: loading ? 0.7 : 1 }}>
@@ -110,3 +183,4 @@ const CodingSetter = () => {
 };
 
 export default CodingSetter;
+

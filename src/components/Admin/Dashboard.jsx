@@ -1,33 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Activity, GraduationCap } from 'lucide-react';
+import { Users, Code, BookOpen, TrendingUp } from 'lucide-react';
 import { db } from '../../firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, PieChart, Pie } from 'recharts';
 
 const AdminDashboard = () => {
   const [students, setStudents] = useState([]);
+  const [totalProblems, setTotalProblems] = useState(0);
+  const [totalAptitudeQuestions, setTotalAptitudeQuestions] = useState(0);
+  const [avgStudentScore, setAvgStudentScore] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchStudents = async () => {
+    const fetchData = async () => {
       try {
+        // Fetch students
         const q = query(collection(db, "users"), where("role", "==", "student"));
         const querySnapshot = await getDocs(q);
         
         const fetchedStudents = [];
+        let totalScore = 0;
         querySnapshot.forEach((doc) => {
-          fetchedStudents.push({ id: doc.id, ...doc.data() });
+          const data = { id: doc.id, ...doc.data() };
+          fetchedStudents.push(data);
+          const perf = data.performance || {};
+          totalScore += perf.overallScore || 0;
         });
-
         setStudents(fetchedStudents);
+        setAvgStudentScore(fetchedStudents.length > 0 ? Math.floor(totalScore / fetchedStudents.length) : 0);
+
+        // Fetch total coding problems
+        const problemsSnap = await getDocs(collection(db, "problems"));
+        setTotalProblems(problemsSnap.size);
+
+        // Fetch total aptitude questions
+        const aptitudeSnap = await getDocs(collection(db, "aptitude_questions"));
+        setTotalAptitudeQuestions(aptitudeSnap.size);
       } catch (error) {
-        console.error("Error fetching students:", error);
+        console.error("Error fetching dashboard data:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchStudents();
+    fetchData();
   }, []);
 
   const totalStudents = students.length;
@@ -59,8 +75,9 @@ const AdminDashboard = () => {
 
   const adminMetrics = [
     { label: 'Total Registered Students', value: loading ? '...' : totalStudents, icon: <Users size={24} color="var(--accent-primary)" /> },
-    { label: 'Platform Status', value: 'Live', icon: <Activity size={24} color="var(--success)" /> },
-    { label: 'Database Connection', value: loading ? 'Syncing...' : 'Connected', icon: <GraduationCap size={24} color="var(--warning)" /> },
+    { label: 'Total Coding Problems', value: loading ? '...' : totalProblems, icon: <Code size={24} color="var(--success)" /> },
+    { label: 'Total Aptitude Questions', value: loading ? '...' : totalAptitudeQuestions, icon: <BookOpen size={24} color="var(--warning)" /> },
+    { label: 'Avg Student Score', value: loading ? '...' : `${avgStudentScore}%`, icon: <TrendingUp size={24} color="var(--accent-secondary)" /> },
   ];
 
   return (

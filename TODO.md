@@ -1,17 +1,36 @@
-# MockInterview + Dashboard + ResumeAnalyzer Fix Plan
+# Admin Enhancements Plan
 
-- [x] Analyze current MockInterview.jsx and project Firebase setup
-- [x] Get user approval for plan
-- [x] Fix all broken JSX (missing closing tags in Setup, Active Interview, Report screens)
-- [x] Harden Firebase save logic (admin-bypass check, isolated try/catch, success indicator)
-- [x] Add maxQuestions limit with auto-conclude (prevents infinite interviews & token burn)
-- [x] Add question count selector to setup screen (3 / 5 / 10 questions)
-- [x] Update getSystemPrompt to tell AI current question number & final question cue
-- [x] Add autoConcludeInterview helper that grades final answer after maxQuestions
-- [x] Guard processTextAnswer & processAudioPayload to auto-stop at maxQuestions
-- [x] Update Dashboard.jsx to read from new Firebase locations (latestMockInterview.score, totalInterviewsDone) with backwards-compatible fallbacks
-- [x] Fix ResumeAnalyzer.jsx model name (gemini-2.5-flash → gemini-1.5-flash)
-- [x] Fix ResumeAnalyzer.jsx Firebase "Accidental Wipe" bug (use dot notation "performance.atsScore" instead of replacing whole performance object)
-- [x] Verify all files compile correctly
+## Tasks
+- [x] 1. UserManagement.jsx — Add Student Details Modal with Profile + Stats tabs
+- [x] 2. Admin/Dashboard.jsx — Replace static metrics with real DB stats
+- [x] 3. Admin/CodingSetter.jsx — Dynamic Add/Remove Hidden Test Cases
+- [x] 4. Admin/AptitudeSetter.jsx — Bulk Batch Entry (20 questions, 4 sections)
 
+## Details
+
+### Task 1: UserManagement.jsx
+- Add `selectedStudent` state and modal overlay
+- Fetch student-specific data on row click
+- Profile Tab: name, email, degree, year, language, career goal, weakness
+- Stats Tab: Coding Score, Aptitude Score, Interview Score, ATS Score, Overall Readiness
+- Add "View" icon in Actions column
+
+### Task 2: Admin/Dashboard.jsx
+- Fetch `problems` and `aptitude_questions` collections
+- Replace metrics:
+  - "Platform Status: Live" → "Total Coding Problems"
+  - "Database Connection: Connected" → "Total Aptitude Questions"
+  - Add "Avg Student Score"
+
+### Task 3: Admin/CodingSetter.jsx
+- Replace single hidden case with `hiddenCases` array state
+- Add "Add Hidden Test Case" button
+- Add "Remove" button per hidden case
+- Submit all non-empty hidden cases
+
+### Task 4: Admin/AptitudeSetter.jsx
+- Redesign to batch builder with section tabs
+- Sections: Logical, Reasoning, Grammar, Mathematics (5 each)
+- Section progress counter
+- "Deploy Full Batch" button with Promise.all
 
