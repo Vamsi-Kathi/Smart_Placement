@@ -75,7 +75,7 @@ const Home = () => {
       </AnimatePresence>
 
       {/* Top Navbar */}
-      <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem 4rem', position: 'fixed', top: 0, width: '100%', background: 'rgba(11, 15, 25, 0.8)', backdropFilter: 'blur(10px)', zIndex: 50, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+      <nav className="mob-nav" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem 4rem', position: 'fixed', top: 0, width: '100%', background: 'rgba(11, 15, 25, 0.8)', backdropFilter: 'blur(10px)', zIndex: 50, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: 800, fontSize: '1.25rem' }}>
           <div style={{ width: 32, height: 32, borderRadius: '8px', background: 'var(--accent-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
              <Target size={18} color="white" />
@@ -88,7 +88,7 @@ const Home = () => {
            <span onClick={() => scrollTo('contact')} style={{cursor: 'pointer', opacity: 0.8}}>Contact</span>
         </div>
         <div style={{ display: 'flex', gap: '1rem' }}>
-          <button onClick={() => navigate('/auth')} style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', fontWeight: 600, padding: '0.5rem 1rem', cursor: 'pointer' }}>Login</button>
+          <button onClick={() => navigate('/auth', { state: { isLogin: true } })} style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', fontWeight: 600, padding: '0.5rem 1rem', cursor: 'pointer' }}>Login</button>
           <button onClick={() => navigate('/auth')} className="btn-primary" style={{ padding: '0.5rem 1.5rem', borderRadius: '20px' }}>Sign Up <ArrowRight size={16} style={{display: 'inline', verticalAlign: 'middle'}}/></button>
         </div>
       </nav>
@@ -108,7 +108,7 @@ const Home = () => {
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
              <button onClick={() => navigate('/auth')} className="btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.05rem', borderRadius: '8px' }}>Start Preparing — Free</button>
-             <button onClick={() => navigate('/auth')} className="btn-secondary" style={{ padding: '1rem 2rem', fontSize: '1.05rem', borderRadius: '8px' }}><LayoutDashboard size={18} style={{display: 'inline', verticalAlign: 'middle', marginRight: '0.5rem'}}/> Login to Dashboard</button>
+             <button onClick={() => navigate('/auth', { state: { isLogin: true } })} className="btn-secondary" style={{ padding: '1rem 2rem', fontSize: '1.05rem', borderRadius: '8px' }}><LayoutDashboard size={18} style={{display: 'inline', verticalAlign: 'middle', marginRight: '0.5rem'}}/> Login to Dashboard</button>
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginTop: '1.5rem', color: 'var(--text-secondary)', fontSize: '0.8rem', fontWeight: 600 }}>
             <span>✓ No Credit Card</span> <span>✓ 100% Privacy Safe</span> <span>✓ AI Powered</span>
@@ -116,22 +116,22 @@ const Home = () => {
         </motion.div>
 
         {/* Global Stats */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '4rem', padding: '3rem 0', width: '100%', borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <div className="mob-stats" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '4rem', padding: '3rem 0', width: '100%', borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
            <div style={{ textAlign: 'center' }}>
              <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--accent-primary)' }}>10,000+</div>
              <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Placed Students</div>
            </div>
-           <div style={{ width: '1px', background: 'rgba(255,255,255,0.1)' }}></div>
+           <div className="divider" style={{ width: '1px', background: 'rgba(255,255,255,0.1)' }}></div>
            <div style={{ textAlign: 'center' }}>
              <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--text-primary)' }}>500+</div>
              <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Hiring Partners</div>
            </div>
-           <div style={{ width: '1px', background: 'rgba(255,255,255,0.1)' }}></div>
+           <div className="divider" style={{ width: '1px', background: 'rgba(255,255,255,0.1)' }}></div>
            <div style={{ textAlign: 'center' }}>
              <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--text-primary)' }}>200+</div>
              <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Companies Hiring</div>
            </div>
-           <div style={{ width: '1px', background: 'rgba(255,255,255,0.1)' }}></div>
+           <div className="divider" style={{ width: '1px', background: 'rgba(255,255,255,0.1)' }}></div>
            <div style={{ textAlign: 'center' }}>
              <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--text-primary)' }}>94%</div>
              <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Placement Rate</div>
@@ -160,10 +160,10 @@ const Home = () => {
         <div id="how-it-works" style={{ width: '100%', maxWidth: '1000px', margin: '8rem auto 0', textAlign: 'center' }}>
            <h2 className="heading-lg" style={{ marginBottom: '4rem' }}>How It Works</h2>
            
-           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem', position: 'relative' }}>
+           <div className="how-it-works-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem', position: 'relative' }}>
               
               {/* Connecting Line */}
-              <div style={{ position: 'absolute', top: '40px', left: '15%', right: '15%', height: '2px', background: 'rgba(255,255,255,0.1)', zIndex: 0 }}>
+              <div className="how-it-works-line" style={{ position: 'absolute', top: '40px', left: '15%', right: '15%', height: '2px', background: 'rgba(255,255,255,0.1)', zIndex: 0 }}>
                  <div style={{ height: '100%', width: '100%', background: 'linear-gradient(90deg, var(--accent-primary), var(--success))', opacity: 0.5 }}></div>
               </div>
 
@@ -194,14 +194,14 @@ const Home = () => {
            <h2 className="heading-lg" style={{ marginBottom: '1rem' }}>Contact Support</h2>
            <p style={{ color: 'var(--text-secondary)', marginBottom: '3rem', maxWidth: '400px' }}>Having trouble with your student profile or looking to partner as an enterprise?</p>
            
-           <div style={{ display: 'flex', width: '100%', gap: '1rem', marginBottom: '2rem' }}>
+           <div className="mob-col" style={{ display: 'flex', width: '100%', gap: '1rem', marginBottom: '2rem' }}>
               <input type="email" placeholder="Your University/Company Email" style={{ flex: 1, padding: '1rem 1.5rem', borderRadius: '12px', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--panel-border)', color: 'white', outline: 'none' }} />
               <button className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '12px' }}>
                  <Send size={18} /> Send Message
               </button>
            </div>
            
-           <div style={{ display: 'flex', gap: '3rem', color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: 600 }}>
+           <div className="mob-col" style={{ display: 'flex', gap: '3rem', color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: 600 }}>
               <span>📍 Bangalore, India 560001</span>
               <span>✉️ admin@smartplacement.com</span>
               <span>📞 +91 98765 43210</span>
@@ -217,9 +217,9 @@ const Home = () => {
            <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '1.1rem', marginBottom: '2.5rem', maxWidth: '600px', margin: '0 auto 2.5rem' }}>
               Join 10,000+ students who landed their dream jobs using Smart Placement Platform. Start perfectly free today.
            </p>
-           <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
              <button onClick={() => navigate('/auth')} style={{ padding: '1rem 2rem', fontSize: '1.05rem', borderRadius: '8px', background: 'white', color: 'var(--accent-primary)', fontWeight: 700, border: 'none', cursor: 'pointer' }}>Get Started For Free</button>
-             <button onClick={() => navigate('/auth')} style={{ padding: '1rem 2rem', fontSize: '1.05rem', borderRadius: '8px', background: 'transparent', border: '1px solid rgba(255,255,255,0.5)', color: 'white', fontWeight: 600, cursor: 'pointer' }}>Login to Platform</button>
+             <button onClick={() => navigate('/auth', { state: { isLogin: true } })} style={{ padding: '1rem 2rem', fontSize: '1.05rem', borderRadius: '8px', background: 'transparent', border: '1px solid rgba(255,255,255,0.5)', color: 'white', fontWeight: 600, cursor: 'pointer' }}>Login to Platform</button>
            </div>
         </div>
 

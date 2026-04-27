@@ -145,3 +145,157 @@
 .ai-floating-btn:hover {
   transform: scale(1.1) rotate(15deg);
 }
+
+/* Responsive Matrix layout for MockInterview */
+@media (max-width: 768px) {
+  .mock-interview-layout {
+    flex-direction: column !important;
+  }
+  .telemetry-panel {
+    width: 100% !important;
+    position: relative !important;
+    height: auto !important;
+    order: 2 !important;
+    border-left: none !important;
+    border-top: 1px solid var(--panel-border) !important;
+  }
+  .mock-main-stage {
+    order: 1 !important;
+    min-height: 50vh !important;
+  }
+  .miniature-webcam {
+    width: 140px !important;
+    height: 100px !important;
+    top: 1rem !important;
+    right: 1rem !important;
+  }
+}
+
+/* SPRINT 10: MASSIVE GLOBAL MOBILE MATRIX */
+@media (max-width: 768px) {
+  
+  /* Reset Main App Container scaling */
+  .app-container {
+    flex-direction: column !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow-x: hidden !important;
+  }
+  
+  /* Sidebar squishes into Top Nav */
+  .sidebar { 
+    width: 100% !important; 
+    height: auto !important; 
+    flex-direction: row !important; 
+    overflow-x: auto !important; 
+    padding: 1rem !important; 
+    border-bottom: 1px solid var(--panel-border) !important; 
+    border-right: none !important; 
+  }
+  .sidebar-logo {
+     display: none !important; /* Hide massive text logo on tiny phone row */
+  }
+  .sidebar-nav {
+     flex-direction: row !important;
+     gap: 1rem !important;
+  }
+  .nav-item {
+     padding: 0.5rem 1rem !important;
+     white-space: nowrap !important;
+  }
+  
+  .main-content { padding: 1.5rem !important; }
+
+  /* Generic Force Column layout for Flex rows */
+  .mob-col {
+     flex-direction: column !important;
+     align-items: center !important;
+     gap: 1.5rem !important;
+  }
+
+  /* Target Home.jsx Nav Bar specifically */
+  .mob-nav {
+     flex-direction: column !important;
+     padding: 1rem !important;
+     gap: 1rem !important;
+     position: relative !important; /* unfix it if it's jumping over content */
+  }
+  .mob-nav > div {
+     justify-content: center !important;
+     flex-wrap: wrap !important;
+  }
+
+  /* Target Global Stats 500+ */
+  .mob-stats {
+     flex-direction: column !important;
+     gap: 2rem !important;
+     padding: 2rem 0 !important;
+  }
+  .mob-stats .divider {
+     width: 100% !important;
+     height: 1px !important;
+     display: block !important;
+  }
+
+  /* How-it-works overrides */
+  .how-it-works-grid {
+     grid-template-columns: 1fr !important;
+     gap: 3rem !important;
+  }
+  .how-it-works-line { display: none !important; }
+  
+  /* Auth Split Screen Overrides */
+  .auth-split-wrapper {
+     flex-direction: column !important;
+     height: auto !important; 
+  }
+  .auth-hero-panel {
+     padding: 2rem !important;
+     width: 100% !important;
+  }
+  .auth-form-panel {
+     padding: 2rem !important;
+     width: 100% !important;
+  }
+
+  /* Coding IDE Splits */
+  .coding-split-wrapper {
+     flex-direction: column !important;
+     height: auto !important;
+  }
+  .coding-pane {
+     width: 100% !important;
+     height: 50vh !important;
+  }
+
+  /* Dashboards Aggressive Grid Wrapping to override repeat(4, 1fr) inline */
+  .dash-grid-top {
+     grid-template-columns: 1fr !important;
+  }
+  .dash-grid-mid {
+     grid-template-columns: 1fr !important;
+     height: auto !important; 
+  }
+  .dash-grid-bot {
+     grid-template-columns: 1fr !important;
+     height: auto !important;
+  }
+  
+  /* Fix heading scales */
+  .heading-lg { font-size: 2.2rem !important; text-align: center; }
+  .heading-md { font-size: 1.8rem !important; text-align: center; }
+  .heading-ld { font-size: 1.6rem !important; text-align: center; }
+  
+  /* Footer Fix */
+  footer {
+     flex-direction: column !important;
+     gap: 2rem !important;
+     padding: 2rem !important;
+     text-align: center !important;
+  }
+  footer > div {
+     justify-content: center !important;
+     align-items: center !important;
+  }
+}
+

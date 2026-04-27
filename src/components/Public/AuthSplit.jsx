@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { auth, db } from '../../firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
@@ -9,8 +9,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const AuthSplit = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { forceAdminLogin } = useAppContext();
-  const [isSignUp, setIsSignUp] = useState(true);
+  const [isSignUp, setIsSignUp] = useState(location.state?.isLogin === true ? false : true);
+  
+  React.useEffect(() => {
+     if (location.state?.isLogin === true) {
+        setIsSignUp(false);
+     }
+  }, [location]);
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -84,10 +91,10 @@ const AuthSplit = () => {
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', width: '100vw', background: 'var(--bg-color)' }}>
+    <div className="auth-split-wrapper" style={{ display: 'flex', minHeight: '100vh', width: '100vw', background: 'var(--bg-color)' }}>
       
       {/* LEFT ORANGE PANEL */}
-      <div style={{ flex: 1, background: 'var(--accent-primary)', padding: '4rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', color: 'white' }}>
+      <div className="auth-hero-panel" style={{ flex: 1, background: 'var(--accent-primary)', padding: '4rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', color: 'white' }}>
          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
             <div style={{ width: 48, height: 48, borderRadius: '12px', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '2rem' }}>
                 <Target size={24} color="white" />
@@ -106,8 +113,7 @@ const AuthSplit = () => {
          </motion.div>
       </div>
 
-      {/* RIGHT AUTH PANEL */}
-      <div style={{ flex: 1, background: 'var(--bg-color)', padding: '4rem', display: 'flex', flexDirection: 'column', position: 'relative', overflowY: 'auto' }}>
+      <div className="auth-form-panel" style={{ flex: 1, background: 'var(--bg-color)', padding: '4rem', display: 'flex', flexDirection: 'column', position: 'relative', overflowY: 'auto' }}>
          
          {/* Top Branding & Toggles */}
          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>

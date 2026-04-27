@@ -109,6 +109,9 @@ const StudentDashboard = () => {
         const aptScore = data.performance?.aptitudeScore || 0;
         const intScore = data.performance?.interviewScore || 0;
         const atsScore = data.performance?.atsScore || 0;
+        const interviewsDone = data.performance?.interviewsDone || 0;
+        const ptsTaken = (aptScore > 0 ? 1 : 0); // Simplified placeholder
+        
         const overScore = Math.floor((codingScore + aptScore + intScore + atsScore) / 4);
         
         data.performance = {
@@ -116,6 +119,8 @@ const StudentDashboard = () => {
           overallScore: overScore,
           aptitudeScore: aptScore,
           interviewScore: intScore,
+          interviewsDone: interviewsDone,
+          testsTaken: ptsTaken,
           atsScore: atsScore
         };
 
@@ -148,14 +153,15 @@ const StudentDashboard = () => {
     { day: '08 Apr', score: 50 }, { day: '09 Apr', score: 50 }, { day: '10 Apr', score: p.aptitudeScore }
   ];
 
-  // Mock Radar for Interview
+  // Dynamic Radar for Interview
+  const radarBase = p.interviewScore > 0 ? p.interviewScore : 40;
   const interviewRadar = [
-    { subject: 'Confidence', A: p.interviewScore > 0 ? p.interviewScore : 40 },
-    { subject: 'Communication', A: p.interviewScore > 0 ? p.interviewScore + 10 : 30 },
-    { subject: 'Clarity', A: p.interviewScore > 0 ? p.interviewScore - 5 : 50 },
-    { subject: 'Fluency', A: p.interviewScore > 0 ? p.interviewScore + 5 : 45 },
-    { subject: 'Composure', A: p.interviewScore > 0 ? p.interviewScore - 10 : 35 },
-    { subject: 'Eye Contact', A: p.interviewScore > 0 ? p.interviewScore + 15 : 20 }
+    { subject: 'Confidence', A: Math.min(100, radarBase + (p.interviewsDone * 2)) },
+    { subject: 'Communication', A: Math.min(100, radarBase + 10) },
+    { subject: 'Clarity', A: Math.max(0, radarBase - 5) },
+    { subject: 'Fluency', A: Math.min(100, radarBase + 5) },
+    { subject: 'Composure', A: Math.max(0, radarBase - 15 + (p.interviewsDone * 3)) },
+    { subject: 'Eye Contact', A: Math.min(100, radarBase + 15) }
   ];
 
   const weeklyActivity = [
@@ -177,7 +183,7 @@ const StudentDashboard = () => {
       </div>
 
       {/* TOP ROW: Global Metrics */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(280px, 1.2fr) repeat(4, 1fr)', gap: '1.5rem' }}>
+      <div className="dash-grid-top" style={{ display: 'grid', gridTemplateColumns: 'minmax(280px, 1.2fr) repeat(4, 1fr)', gap: '1.5rem' }}>
          
          <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
             <h3 style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: '0.05em', textTransform: 'uppercase', textAlign: 'center', marginBottom: '1rem' }}>Placement Readiness</h3>
@@ -190,15 +196,15 @@ const StudentDashboard = () => {
          </div>
 
          <MetricCard title="Problems Solved" value={p.solvedCount} icon={<Code2 size={16}/>} progress={p.codingScore} color="var(--accent-primary)" />
-         <MetricCard title="Tests Taken" value={p.aptitudeScore > 0 ? 1 : 0} icon={<BookOpen size={16}/>} progress={p.aptitudeScore} color="var(--success)" />
-         <MetricCard title="Interviews Done" value={p.interviewScore > 0 ? 1 : 0} icon={<Mic size={16}/>} progress={p.interviewScore} color="var(--accent-secondary)" />
+         <MetricCard title="Tests Taken" value={p.testsTaken} icon={<BookOpen size={16}/>} progress={p.aptitudeScore} color="var(--success)" />
+         <MetricCard title="Interviews Done" value={p.interviewsDone} icon={<Mic size={16}/>} progress={p.interviewScore} color="var(--accent-secondary)" />
          
          <MetricCard title="Resume ATS" value={`${p.atsScore}%`} icon={<Briefcase size={16}/>} progress={p.atsScore} color={p.atsScore > 75 ? "var(--success)" : "var(--warning)"} />
 
       </div>
 
       {/* MIDDLE ROW: Deep Analytics */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', height: '350px' }}>
+      <div className="dash-grid-mid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', height: '350px' }}>
          <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
                <div>
@@ -245,7 +251,7 @@ const StudentDashboard = () => {
       </div>
 
       {/* BOTTOM ROW: Skill Radar & ATS */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1.5fr', gap: '1.5rem', height: '320px' }}>
+      <div className="dash-grid-bot" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1.5fr', gap: '1.5rem', height: '320px' }}>
          <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                <div>
@@ -299,7 +305,7 @@ const StudentDashboard = () => {
       </div>
 
       {/* ACTION ROW */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginTop: '1rem' }}>
+      <div className="dash-grid-top" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', margin: '1rem 0 2rem' }}>
           {[
             { t: 'Solve a Problem', sub: 'Coding Practice', route: '/dashboard/coding', icon: <Code2 size={16}/>, color: 'var(--accent-secondary)' },
             { t: 'Take Aptitude Test', sub: 'Multiple Types', route: '/dashboard/aptitude', icon: <BookOpen size={16}/>, color: 'var(--accent-secondary)' },

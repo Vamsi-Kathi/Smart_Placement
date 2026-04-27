@@ -2,10 +2,14 @@ import React, { useState, useRef } from 'react';
 import { UploadCloud, FileText, CheckCircle, AlertTriangle, Search, XCircle, ChevronRight, Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { useAppContext } from '../../context/AppContext';
+import { db } from '../../firebase';
+import { doc, setDoc } from 'firebase/firestore';
 
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 
 const ResumeAnalyzer = () => {
+  const { currentUser } = useAppContext();
   const [fileData, setFileData] = useState(null); // { base64: string, name: string, type: string }
   const [jobDescription, setJobDescription] = useState('');
   
@@ -122,6 +126,17 @@ const ResumeAnalyzer = () => {
       
       const parsedData = JSON.parse(rawText);
       setResults({ ...parsedData, mode: isTargeted ? 'Targeted' : 'Generic' });
+      
+      if (currentUser?.uid && currentUser.uid !== 'admin-bypass') {
+         try {
+            await setDoc(doc(db, "users", currentUser.uid), {
+               performance: { 
+                  atsScore: parsedData.score,
+                  resumeContext: parsedData.summary + " | Strengths: " + (parsedData.strengths || []).join(", ")
+               }
+            }, { merge: true });
+         } catch(e) { console.error("Firebase Sync Error", e); }
+      }
       
     } catch (err) {
       console.error(err);

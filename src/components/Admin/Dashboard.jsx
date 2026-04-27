@@ -95,7 +95,7 @@ const AdminDashboard = () => {
       <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
         
         {/* Graph 1 */}
-        <div className="glass-panel" style={{ flex: 1, minWidth: '400px', padding: '2rem', height: '400px', display: 'flex', flexDirection: 'column' }}>
+        <div className="glass-panel" style={{ flex: 1, minWidth: '280px', padding: '2rem', height: '400px', display: 'flex', flexDirection: 'column' }}>
           <h3 className="heading-sm" style={{ marginBottom: '1.5rem' }}>Student Batch Distribution</h3>
           {loading ? (
              <div style={{ flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>Loading Database...</div>
@@ -121,7 +121,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Graph 2 */}
-        <div className="glass-panel" style={{ flex: 1, minWidth: '400px', padding: '2rem', height: '400px', display: 'flex', flexDirection: 'column' }}>
+        <div className="glass-panel" style={{ flex: 1, minWidth: '280px', padding: '2rem', height: '400px', display: 'flex', flexDirection: 'column' }}>
           <h3 className="heading-sm" style={{ marginBottom: '1.5rem' }}>Target Company Tiers</h3>
           {loading ? (
              <div style={{ flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>Loading Database...</div>
