@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, X, Send, Bot, User, Loader2 } from 'lucide-react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
@@ -77,12 +76,8 @@ const AIChatAssistant = () => {
         <MessageSquare size={28} color="white" />
       </div>
 
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div 
-            initial={{ opacity: 0, y: 50, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 50, scale: 0.9 }}
+              {isOpen && (
+          <div
             className="glass-panel"
             style={{
               position: 'fixed',
@@ -164,10 +159,9 @@ const AIChatAssistant = () => {
                 <Send size={18} />
               </button>
             </div>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
-    </>
+          </>
   );
 };
 

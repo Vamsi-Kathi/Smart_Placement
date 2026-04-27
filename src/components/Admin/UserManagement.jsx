@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase';
 import { collection, getDocs, query, where, deleteDoc, doc } from 'firebase/firestore';
 import { Search, Trash2, UserX } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 const UserManagement = () => {
   const [students, setStudents] = useState([]);
@@ -96,12 +95,9 @@ const UserManagement = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredStudents.map((student, idx) => (
-                  <motion.tr 
-                    key={student.id} 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.05 }}
+{filteredStudents.map((student) => (
+                  <tr 
+                    key={student.id}
                     style={{ borderBottom: '1px solid rgba(16, 185, 129, 0.05)' }}
                   >
                     <td style={{ padding: '1rem 1.5rem', fontWeight: 600 }}>{student.name}</td>
@@ -125,7 +121,7 @@ const UserManagement = () => {
                         <Trash2 size={16} />
                       </button>
                     </td>
-                  </motion.tr>
+                  </tr>
                 ))}
               </tbody>
             </table>

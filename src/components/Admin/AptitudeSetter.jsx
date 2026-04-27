@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { db } from '../../firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import { BookOpen, PlusCircle, CheckCircle2 } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 const AptitudeSetter = () => {
   const [question, setQuestion] = useState('');
@@ -66,9 +65,9 @@ const AptitudeSetter = () => {
       </div>
 
       {success && (
-        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid var(--success)', padding: '1.5rem', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: '1rem', color: 'var(--success)', fontWeight: 600 }}>
+        <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid var(--success)', padding: '1.5rem', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: '1rem', color: 'var(--success)', fontWeight: 600 }}>
           <CheckCircle2 size={24} /> New aptitude question successfully added!
-        </motion.div>
+        </div>
       )}
 
       <form onSubmit={handleSubmit} className="glass-panel" style={{ padding: '2.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Activity, GraduationCap } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { db } from '../../firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, PieChart, Pie } from 'recharts';
@@ -72,14 +71,11 @@ const AdminDashboard = () => {
       </div>
 
       <div className="dashboard-metrics">
-        {adminMetrics.map((m, i) => (
-          <motion.div 
+        {adminMetrics.map((m) => (
+          <div 
             key={m.label} 
             className="glass-panel"
             style={{ padding: '1.5rem', display: 'flex', gap: '1rem', alignItems: 'center' }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
           >
             <div style={{ padding: '1.25rem', background: 'rgba(255,255,255,0.05)', borderRadius: 'var(--radius-md)' }}>
               {m.icon}
@@ -88,7 +84,7 @@ const AdminDashboard = () => {
               <div className="text-body" style={{ fontSize: '0.9rem' }}>{m.label}</div>
               <div style={{ fontSize: '1.75rem', fontWeight: '800' }}>{m.value}</div>
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
 

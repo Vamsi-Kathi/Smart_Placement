@@ -5,7 +5,6 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfi
 import { doc, setDoc } from 'firebase/firestore';
 import { useAppContext } from '../../context/AppContext';
 import { Eye, EyeOff, Target, ArrowRight } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 const AuthSplit = () => {
   const navigate = useNavigate();
@@ -95,7 +94,7 @@ const AuthSplit = () => {
       
       {/* LEFT ORANGE PANEL */}
       <div className="auth-hero-panel" style={{ flex: 1, background: 'var(--accent-primary)', padding: '4rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', color: 'white' }}>
-         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
+         <div>
             <div style={{ width: 48, height: 48, borderRadius: '12px', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '2rem' }}>
                 <Target size={24} color="white" />
             </div>
@@ -110,7 +109,7 @@ const AuthSplit = () => {
                 <span>• Student and admin workflows</span>
                 <span>• Secure token-based API access</span>
             </div>
-         </motion.div>
+         </div>
       </div>
 
       <div className="auth-form-panel" style={{ flex: 1, background: 'var(--bg-color)', padding: '4rem', display: 'flex', flexDirection: 'column', position: 'relative', overflowY: 'auto' }}>

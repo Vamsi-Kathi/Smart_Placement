@@ -1,8 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { AppProvider, useAppContext } from './context/AppContext';
-import { LayoutDashboard, Code, BookOpen, Mic, FileText, Briefcase, Settings, Users, LogOut, MessageSquare, Database, Moon, Sun } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { LayoutDashboard, Code, BookOpen, Mic, FileText, Briefcase, Users, LogOut, Database } from 'lucide-react';
 import './App.css';
 
 // Public Components
@@ -86,7 +85,7 @@ const Sidebar = () => {
 
 // Topbar for Dashboard
 const TopBar = () => {
-  const { mockStudentData, userRole, theme, toggleTheme } = useAppContext();
+  const { mockStudentData, userRole } = useAppContext();
   return (
     <div className="top-bar">
       <h2 className="heading-sm">{userRole === 'admin' ? 'Administrator Panel' : 'Student Portal'}</h2>
@@ -116,14 +115,9 @@ const DashboardLayout = ({ children }) => {
       <Sidebar />
       <div className="main-content">
         <TopBar />
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          style={{ height: '100%' }}
-        >
+        <div style={{ height: '100%' }}>
           {children}
-        </motion.div>
+        </div>
       </div>
       
       {/* Floating AI Assistant Widget */}

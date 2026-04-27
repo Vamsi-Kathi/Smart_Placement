@@ -5,7 +5,7 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfi
 import { doc, setDoc } from 'firebase/firestore';
 import { useAppContext } from '../../context/AppContext';
 import { Eye, EyeOff, CheckCircle2, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 
 const AuthModal = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
@@ -21,9 +21,9 @@ const AuthModal = ({ isOpen, onClose }) => {
   const [degree, setDegree] = useState('B.Tech Computer Science');
   const [year, setYear] = useState('3rd Year');
   const [primaryLanguage, setPrimaryLanguage] = useState('Python');
-  const [careerGoal, setCareerGoal] = useState('Full Stack Developer');
-  const [weakness, setWeakness] = useState('Data Structures & Algorithms');
-  const [targetCompany, setTargetCompany] = useState('Product Based (FAANG/Top Tech)');
+  const careerGoal = 'Full Stack Developer';
+  const weakness = 'Data Structures & Algorithms';
+  const targetCompany = 'Product Based (FAANG/Top Tech)';
 
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -84,15 +84,13 @@ const AuthModal = ({ isOpen, onClose }) => {
 
   return (
     <AnimatePresence>
-      <motion.div 
+      <div 
         className="modal-overlay"
         style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(5px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, overflowY: 'auto', padding: '2rem' }}
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         onClick={onClose}
       >
-        <motion.div 
+        <div 
           onClick={(e) => e.stopPropagation()}
-          initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }}
           className="glass-panel" 
           style={{ width: '100%', maxWidth: '550px', padding: '2.5rem 3rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'relative' }}
         >
@@ -219,8 +217,8 @@ const AuthModal = ({ isOpen, onClose }) => {
             </>
           )}
 
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </AnimatePresence>
   );
 };

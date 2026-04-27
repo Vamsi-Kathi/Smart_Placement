@@ -5,7 +5,6 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfi
 import { doc, setDoc } from 'firebase/firestore';
 import { useAppContext } from '../../context/AppContext';
 import { Eye, EyeOff, CheckCircle2 } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -21,9 +20,9 @@ const Login = () => {
   const [degree, setDegree] = useState('B.Tech Computer Science');
   const [year, setYear] = useState('3rd Year');
   const [primaryLanguage, setPrimaryLanguage] = useState('Python');
-  const [careerGoal, setCareerGoal] = useState('Full Stack Developer');
-  const [weakness, setWeakness] = useState('Data Structures & Algorithms');
-  const [targetCompany, setTargetCompany] = useState('Product Based (FAANG/Top Tech)');
+  const careerGoal = 'Full Stack Developer';
+  const weakness = 'Data Structures & Algorithms';
+  const targetCompany = 'Product Based (FAANG/Top Tech)';
 
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -88,14 +87,14 @@ const Login = () => {
   if (successMode) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
-        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="glass-panel" style={{ width: '100%', maxWidth: '450px', padding: '3rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
+        <div className="glass-panel" style={{ width: '100%', maxWidth: '450px', padding: '3rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
           <CheckCircle2 size={64} className="text-gradient" />
           <h2 className="heading-md">Registration Successful!</h2>
           <p className="text-body">Your AI career profile has been created successfully. You can now login with your credentials.</p>
           <button onClick={() => { setSuccessMode(false); setIsSignUp(false); setPassword(''); }} className="btn-primary" style={{ width: '100%', marginTop: '1rem' }}>
             Go to Login
           </button>
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -108,7 +107,7 @@ const Login = () => {
         &larr; Back to Home
       </Link>
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-panel" style={{ width: '100%', maxWidth: '550px', padding: '2.5rem 3rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', maxHeight: '90vh', overflowY: 'auto' }}>
+      <div className="glass-panel" style={{ width: '100%', maxWidth: '550px', padding: '2.5rem 3rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', maxHeight: '90vh', overflowY: 'auto' }}>
         
         <div style={{ display: 'flex', background: 'rgba(0,0,0,0.05)', borderRadius: 'var(--radius-sm)', padding: '0.25rem' }}>
           <button 
@@ -132,9 +131,9 @@ const Login = () => {
         </div>
 
         {error && (
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} style={{ background: 'rgba(244, 63, 94, 0.1)', border: '1px solid rgba(244, 63, 94, 0.2)', color: 'var(--danger)', padding: '1rem', borderRadius: 'var(--radius-sm)', fontSize: '0.9rem', textAlign: 'center', fontWeight: '500' }}>
+          <div style={{ background: 'rgba(244, 63, 94, 0.1)', border: '1px solid rgba(244, 63, 94, 0.2)', color: 'var(--danger)', padding: '1rem', borderRadius: 'var(--radius-sm)', fontSize: '0.9rem', textAlign: 'center', fontWeight: '500' }}>
             {error}
-          </motion.div>
+          </div>
         )}
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -215,7 +214,7 @@ const Login = () => {
 
         </form>
 
-      </motion.div>
+      </div>
     </div>
   );
 };

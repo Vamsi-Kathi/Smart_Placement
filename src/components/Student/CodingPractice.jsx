@@ -3,7 +3,6 @@ import { db } from '../../firebase';
 import { collection, getDocs, doc, getDoc, setDoc } from 'firebase/firestore';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Code2, Play, CheckCircle2, AlertTriangle, ShieldAlert, BookOpen, Send, ListTree, Search } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import Editor from '@monaco-editor/react';
 import { useAppContext } from '../../context/AppContext';
 
@@ -27,7 +26,7 @@ const CodingPractice = () => {
   const [terminalOutput, setTerminalOutput] = useState(null);
 
   // Lock down the Monaco Instance directly
-  const handleEditorDidMount = (editor, monaco) => {
+  const handleEditorDidMount = (editor) => {
     editor.updateOptions({ contextmenu: false }); // Disable Right Click natively
     
     editor.onKeyDown((e) => {
@@ -248,15 +247,13 @@ const CodingPractice = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredProblems.map((prob, idx) => {
+                  {filteredProblems.map((prob) => {
                     const probData = userProgress[prob.id];
                     return (
-                    <motion.tr 
+                    <tr 
                       key={prob.id} 
                       onClick={() => { setActiveProblem(prob); setViewState('solve'); setTerminalOutput(null); }}
                       style={{ borderBottom: '1px solid var(--panel-border)', cursor: 'pointer', transition: 'background 0.2s ease' }}
-                      whileHover={{ backgroundColor: 'var(--overlay-bg)' }}
-                      initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }}
                     >
                       <td style={{ padding: '1rem 1.5rem' }}>
                          {probData?.solved ? (
@@ -272,7 +269,7 @@ const CodingPractice = () => {
                          {probData ? `${probData.highestScore}/100` : '-'}
                       </td>
                       <td style={{ padding: '1rem 1.5rem', fontWeight: 600, color: getDifficultyColor(prob.level) }}>{prob.level}</td>
-                    </motion.tr>
+                    </tr>
                   )})}
                 </tbody>
               </table>

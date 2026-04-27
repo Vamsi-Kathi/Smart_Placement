@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
-import { motion } from 'framer-motion';
 import { db } from '../../firebase';
 import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +11,7 @@ import {
 } from 'recharts';
 import { Code2, BookOpen, Mic, Briefcase, ChevronRight } from 'lucide-react';
 
-const CircularProgress = ({ value, color, topText, bottomText, subText }) => {
+const CircularProgress = ({ value, color, bottomText, subText }) => {
   const data = [{ value }, { value: 100 - value }];
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', width: '100%', height: '100%' }}>
@@ -107,9 +106,14 @@ const StudentDashboard = () => {
         
         const codingScore = totalPossibleWeight > 0 ? Math.floor((earnedWeight / totalPossibleWeight) * 100) : 0;
         const aptScore = data.performance?.aptitudeScore || 0;
-        const intScore = data.performance?.interviewScore || 0;
+
+        // 🔥 NEW: Check for the new mock interview save location first, then fallback to performance
+        const intScore = data.latestMockInterview?.score || data.performance?.interviewScore || 0;
         const atsScore = data.performance?.atsScore || 0;
-        const interviewsDone = data.performance?.interviewsDone || 0;
+
+        // 🔥 NEW: Check root level for interviews done, then fallback to performance
+        const interviewsDone = data.totalInterviewsDone || data.performance?.interviewsDone || 0;
+
         const ptsTaken = (aptScore > 0 ? 1 : 0); // Simplified placeholder
         
         const overScore = Math.floor((codingScore + aptScore + intScore + atsScore) / 4);
@@ -312,9 +316,8 @@ const StudentDashboard = () => {
             { t: 'Mock Interview', sub: 'Voice AI Session', route: '/dashboard/interview', icon: <Mic size={16}/>, color: 'var(--accent-primary)' },
             { t: 'Browse Jobs', sub: 'AI Job Matching', route: '/dashboard/jobs', icon: <Briefcase size={16}/>, color: 'var(--accent-primary)' }
           ].map(action => (
-             <motion.div 
+             <div 
                key={action.t}
-               whileHover={{ y: -4, background: 'var(--panel-border)' }}
                onClick={() => navigate(action.route)}
                className="glass-panel" 
                style={{ padding: '1.25rem', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '1rem' }}
@@ -324,7 +327,7 @@ const StudentDashboard = () => {
                    <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: action.color }}>{action.t}</h4>
                    <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>{action.sub}</p>
                 </div>
-             </motion.div>
+             </div>
           ))}
       </div>
 

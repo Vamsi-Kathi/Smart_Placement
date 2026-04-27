@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Target, ArrowRight, Code2, Video, FileCheck, BrainCircuit, BarChart4, Database, Briefcase, Star, LayoutDashboard, BookOpen, X, Send } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 const FeatureCard = ({ title, desc, expanded, icon, color, setModalData }) => (
-  <motion.div 
-    whileHover={{ y: -5 }}
+  <div 
     className="glass-panel" 
     style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem', borderTop: `4px solid ${color}`, position: 'relative', overflow: 'hidden' }}
   >
@@ -22,7 +20,7 @@ const FeatureCard = ({ title, desc, expanded, icon, color, setModalData }) => (
          Learn More <ArrowRight size={14} />
        </span>
     </div>
-  </motion.div>
+  </div>
 );
 
 const Home = () => {
@@ -42,15 +40,12 @@ const Home = () => {
     <div style={{ width: '100vw', minHeight: '100vh', background: 'var(--bg-color)', overflowX: 'hidden' }}>
       
       {/* Expanded Modal */}
-      <AnimatePresence>
-        {modalData && (
-          <motion.div 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              {modalData && (
+          <div
             style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}
             onClick={() => setModalData(null)}
           >
-            <motion.div 
-              initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
+            <div
               onClick={e => e.stopPropagation()}
               className="glass-panel"
               style={{ padding: '3rem', maxWidth: '600px', width: '100%', borderTop: `4px solid ${modalData.color}`, position: 'relative' }}
@@ -69,11 +64,10 @@ const Home = () => {
                  {modalData.desc}
               </div>
               <button className="btn-primary" onClick={() => navigate('/auth')} style={{ marginTop: '2.5rem', width: '100%', background: modalData.color }}>Try it now</button>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         )}
-      </AnimatePresence>
-
+      
       {/* Top Navbar */}
       <nav className="mob-nav" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem 4rem', position: 'fixed', top: 0, width: '100%', background: 'rgba(11, 15, 25, 0.8)', backdropFilter: 'blur(10px)', zIndex: 50, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: 800, fontSize: '1.25rem' }}>
@@ -96,7 +90,7 @@ const Home = () => {
       <main style={{ padding: '8rem 2rem 4rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         
         {/* HUGE HERO */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} style={{ textAlign: 'center', maxWidth: '800px', marginBottom: '4rem' }}>
+        <div style={{ textAlign: 'center', maxWidth: '800px', marginBottom: '4rem' }}>
           <div style={{ background: 'rgba(255, 110, 0, 0.1)', color: 'var(--accent-primary)', padding: '0.5rem 1rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 700, display: 'inline-block', marginBottom: '1.5rem', border: '1px solid rgba(255, 110, 0, 0.2)' }}>
             ✨ Next-Gen Placement Intelligence Platform
           </div>
@@ -113,7 +107,7 @@ const Home = () => {
           <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginTop: '1.5rem', color: 'var(--text-secondary)', fontSize: '0.8rem', fontWeight: 600 }}>
             <span>✓ No Credit Card</span> <span>✓ 100% Privacy Safe</span> <span>✓ AI Powered</span>
           </div>
-        </motion.div>
+        </div>
 
         {/* Global Stats */}
         <div className="mob-stats" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '4rem', padding: '3rem 0', width: '100%', borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>

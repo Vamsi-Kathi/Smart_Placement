@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { UploadCloud, FileText, CheckCircle, AlertTriangle, Search, XCircle, ChevronRight, Activity } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { useAppContext } from '../../context/AppContext';
 import { db } from '../../firebase';
@@ -72,7 +71,7 @@ const ResumeAnalyzer = () => {
     setError('');
     
     try {
-      const model = genAI.getGenerativeModel({ 
+      const model = genAI.getGenerativeModel({
          model: "gemini-2.5-flash",
          generationConfig: { responseMimeType: "application/json" }
       });
@@ -127,13 +126,12 @@ const ResumeAnalyzer = () => {
       const parsedData = JSON.parse(rawText);
       setResults({ ...parsedData, mode: isTargeted ? 'Targeted' : 'Generic' });
       
+      // 🔥 FIXED FIREBASE SAVE (dot notation prevents wiping other performance fields)
       if (currentUser?.uid && currentUser.uid !== 'admin-bypass') {
          try {
             await setDoc(doc(db, "users", currentUser.uid), {
-               performance: { 
-                  atsScore: parsedData.score,
-                  resumeContext: parsedData.summary + " | Strengths: " + (parsedData.strengths || []).join(", ")
-               }
+               "performance.atsScore": parsedData.score,
+               "performance.resumeContext": parsedData.summary + " | Strengths: " + (parsedData.strengths || []).join(", ")
             }, { merge: true });
          } catch(e) { console.error("Firebase Sync Error", e); }
       }
@@ -181,13 +179,13 @@ const ResumeAnalyzer = () => {
             <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept="application/pdf" style={{ display: 'none' }} />
             
             {fileData ? (
-               <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
                   <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--success)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
                      <FileText size={32} />
                   </div>
                   <h3 className="heading-sm" style={{ color: 'var(--success)' }}>Document Securely Loaded</h3>
                   <p className="text-body" style={{ fontSize: '0.9rem' }}>{fileData.name}</p>
-               </motion.div>
+               </div>
             ) : (
                <>
                   <UploadCloud size={48} color="var(--accent-primary)" style={{ marginBottom: '1rem' }} />
@@ -221,9 +219,9 @@ const ResumeAnalyzer = () => {
           </button>
           
           {error && (
-             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ padding: '1rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid var(--danger)', borderRadius: 'var(--radius-md)', color: 'var(--danger)', fontSize: '0.9rem', display: 'flex', gap: '0.5rem' }}>
+             <div style={{ padding: '1rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid var(--danger)', borderRadius: 'var(--radius-md)', color: 'var(--danger)', fontSize: '0.9rem', display: 'flex', gap: '0.5rem' }}>
                 <AlertTriangle size={18} style={{ flexShrink: 0 }} /> {error}
-             </motion.div>
+             </div>
           )}
         </div>
 
@@ -237,8 +235,7 @@ const ResumeAnalyzer = () => {
                 <p>Upload a PDF to generate analytics constraint matrix.</p>
              </div>
           ) : (
-             <AnimatePresence>
-                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', height: '100%' }}>
+                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', height: '100%' }}>
                    
                    {/* Top Score Bar */}
                    <div className="glass-panel" style={{ padding: '2rem', display: 'flex', alignItems: 'center', gap: '2rem', background: `linear-gradient(135deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 100%)`, borderLeft: `6px solid ${getScoreColor(results.score)}` }}>
@@ -298,9 +295,8 @@ const ResumeAnalyzer = () => {
                       )}
 
                    </div>
-                </motion.div>
-             </AnimatePresence>
-          )}
+                </div>
+                       )}
 
         </div>
       </div>

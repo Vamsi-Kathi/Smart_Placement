@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Search, MapPin, Building, Target, AlertTriangle, ExternalLink, RefreshCcw } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { db } from '../../firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import { useAppContext } from '../../context/AppContext';
@@ -86,12 +85,10 @@ const JobPortal = () => {
             const isMismatch = matchScore < 70;
             
             return (
-              <motion.div 
+              <div 
                 key={job.id}
                 className="glass-panel"
                 style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', border: isMismatch ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid var(--panel-border)' }}
-                whileHover={{ y: -5 }}
-                transition={{ type: 'spring', stiffness: 300 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
@@ -143,7 +140,7 @@ const JobPortal = () => {
                     </button>
                   </a>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>
