@@ -281,10 +281,10 @@ const CodingPractice = () => {
   }
 
   return (
-    <div className="coding-split-wrapper" style={{ display: 'flex', gap: '1rem', height: '100%', width: '100%', overflow: 'hidden' }}>
+    <div className="coding-split-wrapper">
       
       {/* ⬅ LEFT PANE: Description */}
-      <div className="glass-panel coding-pane" style={{ width: '35%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div className="glass-panel coding-pane" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--panel-border)', background: 'var(--bg-color)', display: 'flex', alignItems: 'center', gap: '1rem' }}>
            <button onClick={() => setViewState('list')} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8rem', fontWeight: 'bold' }}>
              &larr; Problem List
@@ -307,7 +307,7 @@ const CodingPractice = () => {
       </div>
 
       {/* ➡ RIGHT PARENT: Split Editor / Terminal */}
-      <div className="coding-pane" style={{ width: '65%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <div className="coding-pane" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         
         {/* TOP RIGHT: Monaco Editor */}
         <div className="glass-panel" style={{ flex: 1.8, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>

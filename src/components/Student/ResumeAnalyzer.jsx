@@ -159,10 +159,10 @@ const ResumeAnalyzer = () => {
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '2rem', flexGrow: 1, flexDirection: 'column', md: { flexDirection: 'row' } }}>
+      <div className="page-split-layout">
         
         {/* Left Side: Upload & Input Controls */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
           <div 
             className="glass-panel" 

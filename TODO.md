@@ -1,31 +1,49 @@
 # Comprehensive Fix Plan
 
-## Issues to Fix
-- [x] **Crash on Save** - `TypeError: Cannot read properties of undefined (reading 'Easy')`
-- [x] **Signup data not showing** - AuthModal saves wrong profile structure
-- [x] **Hardcoded TopBar** - App.jsx shows fake names/initials
-- [x] **Admin metrics broken** - Performance never saved to Firestore
-- [x] **UI alignment** - Grid layouts break on different screens
-- [x] **Database seeding** - Need seed script for demo data
+## Core Issues (Fixed)
+- [x] **Crash on Save** - Safe fallback for undefined level + preserve performance on refresh
+- [x] **Signup data not showing** - Correct profile structure with course, mobile, degree separation
+- [x] **Hardcoded TopBar** - Fetches real name from Firestore, dynamic initials
+- [x] **Admin metrics broken** - Computes performance on-the-fly from codingProgress
+- [x] **UI alignment** - CSS-class grids with 1200px/992px/768px/480px breakpoints
+- [x] **Database seeding** - Master seed script for demo data
+- [x] **Duplicate Edit Profile button** - Removed from Welcome Banner
 
-## Files Edited
-1. `src/components/Student/Dashboard.jsx` - Fixed crash (safe level fallback), preserved performance on save, removed inline grid styles for CSS-controlled responsiveness
-2. `src/components/Public/AuthModal.jsx` - Added separate `course` and `mobile` fields, fixed Firestore save structure
-3. `src/App.jsx` - TopBar now fetches real user profile from Firestore, computes initials dynamically
-4. `src/components/Admin/Dashboard.jsx` - Computes student performance on-the-fly using codingProgress + problem difficulty weights
-5. `src/App.css` - Added `.dash-grid-*` classes with desktop + tablet + mobile breakpoints
-6. `scripts/seedMaster.js` - Created master seed script with demo users, coding problems, aptitude questions, and job postings
+## Aptitude Questions (Fixed)
+- [x] **Identified root cause**: 316 questions were fake/generic from `seedMassiveV5.js`
+  - Template: `"Generic Easy Quantitative Question #1: Solve for X..."`
+  - Options: `["Option A (Correct)", "Option B", "Option C", "Option D"]`
+- [x] **Fixed Admin setter categories**: `['Quantitative', 'Logical', 'Verbal']` (matched Student test)
+- [x] **Created cleanup script**: `scripts/cleanupAptitude.js` — detects and deletes fake questions
+- [x] **Created real seed script**: `scripts/seedRealAptitude.js` — 42 real, verified questions
 
-## Progress
-- [x] Step 1: Fix Student Dashboard (crash + UI)
-- [x] Step 2: Fix AuthModal (signup structure)
-- [x] Step 3: Fix App.jsx (TopBar hardcoded values)
-- [x] Step 4: Fix Admin Dashboard (metrics)
-- [x] Step 5: Fix App.css (responsive grids)
-- [x] Step 6: Create seedMaster.js
+## Files Created/Modified
+| File | Purpose |
+|------|---------|
+| `src/components/Student/Dashboard.jsx` | Crash fix, UI, removed dup button |
+| `src/components/Public/AuthModal.jsx` | Signup profile structure fix |
+| `src/App.jsx` | Dynamic TopBar with real names |
+| `src/components/Admin/Dashboard.jsx` | On-the-fly metrics computation |
+| `src/components/Admin/AptitudeSetter.jsx` | Fixed categories to Quantitative/Logical/Verbal |
+| `src/App.css` | Responsive breakpoints |
+| `scripts/seedMaster.js` | Master demo data seeder |
+| `scripts/cleanupAptitude.js` | Deletes fake/generic aptitude questions |
+| `scripts/seedRealAptitude.js` | 42 real placement aptitude questions |
 
-## How to Run Seed Script
+## How to Clean Up Fake Questions & Seed Real Ones
 ```bash
-node scripts/seedMaster.js
+cd c:\Users\vamsi\OneDrive\Desktop\prjjj
+
+# Step 1: Delete all fake questions (analyzes first, preserves real ones)
+node scripts/cleanupAptitude.js
+
+# Step 2: Seed 42 real questions into Standard Test, TCS NQT, Test 1, Infosys Alpha
+node scripts/seedRealAptitude.js
 ```
-Requires `.env.local` with `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_PROJECT_ID`.
+
+## Responsive Breakpoints Added
+- **1200px**: Dashboard grids collapse to 2 columns
+- **992px**: Page splits (Resume/Coding) stack vertically
+- **768px**: Sidebar horizontal nav, all grids 1 column, modals full-width
+- **480px**: Reduced padding, smaller fonts, compact nav
+

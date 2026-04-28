@@ -243,20 +243,10 @@ const StudentDashboard = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', color: 'var(--text-primary)' }}>
       
-      {/* Welcome Banner */}
-      <div style={{ marginBottom: '0.5rem', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
-        <div>
-          <h1 className="heading-ld" style={{ fontSize: '2rem', fontWeight: 800 }}>Welcome back, {safeName.split(' ')[0]} 👋</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.25rem' }}>Your placement journey dashboard — keep it up!</p>
-        </div>
-        <button 
-          onClick={() => setShowEditModal(true)}
-          className="btn-secondary"
-          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.2rem', fontSize: '0.9rem', fontWeight: 600 }}
-        >
-          <User size={16} />
-          Edit Profile
-        </button>
+
+      <div style={{ marginBottom: '0.5rem' }}>
+        <h1 className="heading-ld" style={{ fontSize: '2rem', fontWeight: 800 }}>Welcome back, {safeName.split(' ')[0]} 👋</h1>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.25rem' }}>Your placement journey dashboard — keep it up!</p>
       </div>
 
       {/* PROFILE INFO CARD */}

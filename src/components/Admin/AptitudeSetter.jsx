@@ -3,7 +3,7 @@ import { db } from '../../firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import { BookOpen, PlusCircle, CheckCircle2, Trash2, Send } from 'lucide-react';
 
-const sections = ['Logical', 'Reasoning', 'Grammar', 'Mathematics'];
+const sections = ['Quantitative', 'Logical', 'Verbal'];
 
 const AptitudeSetter = () => {
   const [testSetName, setTestSetName] = useState('Standard Test');

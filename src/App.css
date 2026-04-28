@@ -75,10 +75,10 @@
   flex-grow: 1;
   height: 100%;
   overflow-y: auto;
-  padding: 2rem 4rem;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
+  gap: 2rem;
   background: transparent;
 }
 
@@ -87,8 +87,24 @@
   justify-content: space-between;
   align-items: center;
   padding-bottom: 1.5rem;
+  margin-bottom: 1rem;
   border-bottom: 1px solid var(--panel-border);
   background: transparent;
+}
+
+/* Standardized split layouts for non-dashboard pages */
+.page-split-layout {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 2rem;
+  width: 100%;
+  height: 100%;
+}
+
+.page-grid-half {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
 }
 
 .user-profile {
@@ -163,6 +179,25 @@
 
 .dash-grid-actions {
   grid-template-columns: repeat(4, 1fr);
+}
+
+/* Tablet breakpoint */
+@media (max-width: 992px) {
+  .page-split-layout {
+    grid-template-columns: 1fr !important;
+    height: auto !important;
+  }
+  .page-grid-half {
+    grid-template-columns: 1fr !important;
+  }
+  .coding-split-wrapper {
+    flex-direction: column !important;
+    height: auto !important;
+  }
+  .coding-pane {
+    width: 100% !important;
+    height: 50vh !important;
+  }
 }
 
 /* Medium screen breakpoint */
@@ -336,6 +371,109 @@
   footer > div {
      justify-content: center !important;
      align-items: center !important;
+  }
+}
+
+/* ============================================
+   MOBILE-SPECIFIC OVERRIDES (max-width: 768px)
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* Modal form: single column */
+  .modal-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* TopBar wrapping */
+  .top-bar {
+    flex-direction: column !important;
+    gap: 1rem !important;
+    align-items: flex-start !important;
+  }
+  
+  .user-profile {
+    align-self: flex-end !important;
+  }
+  
+  /* Aptitude test selector wrapping */
+  .aptitude-selector-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+  
+  /* Job portal cards full width */
+  .job-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* General padding reduction */
+  .glass-panel {
+    padding: 1rem !important;
+  }
+  
+  /* Responsive tables */
+  .responsive-table thead {
+    display: none !important;
+  }
+  .responsive-table tr {
+    display: flex !important;
+    flex-direction: column !important;
+    margin-bottom: 1rem !important;
+    border: 1px solid var(--panel-border) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 1rem !important;
+  }
+  .responsive-table td {
+    display: flex !important;
+    justify-content: space-between !important;
+    padding: 0.5rem 0 !important;
+    border: none !important;
+  }
+  .responsive-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+}
+
+/* ============================================
+   SMALL PHONES (max-width: 480px)
+   ============================================ */
+
+@media (max-width: 480px) {
+  .main-content {
+    padding: 1rem !important;
+    gap: 1rem !important;
+  }
+  
+  .sidebar-nav {
+    gap: 0.5rem !important;
+  }
+  
+  .nav-item {
+    padding: 0.4rem 0.75rem !important;
+    font-size: 0.8rem !important;
+  }
+  
+  .avatar {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 0.8rem !important;
+  }
+  
+  .heading-lg { font-size: 1.8rem !important; }
+  .heading-md { font-size: 1.5rem !important; }
+  .heading-ld { font-size: 1.3rem !important; }
+  
+  .dash-grid-top,
+  .dash-grid-mid,
+  .dash-grid-bot,
+  .dash-grid-actions {
+    gap: 1rem !important;
+  }
+  
+  .page-split-layout {
+    gap: 1rem !important;
   }
 }
 
