@@ -14,24 +14,51 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Fetch problems first for on-the-fly scoring
+        const problemsSnap = await getDocs(collection(db, "problems"));
+        setTotalProblems(problemsSnap.size);
+
+        const diffWeight = { 'Easy': 1, 'Medium': 3, 'Hard': 6, 'Hard Core': 10, 'Expert': 15 };
+        let totalPossibleWeight = 0;
+        const problemLevels = {};
+        problemsSnap.docs.forEach(doc => {
+          const pData = doc.data();
+          const safeLevel = pData.level || 'Easy';
+          problemLevels[doc.id] = safeLevel;
+          totalPossibleWeight += diffWeight[safeLevel] || 1;
+        });
+
         // Fetch students
         const q = query(collection(db, "users"), where("role", "==", "student"));
         const querySnapshot = await getDocs(q);
         
         const fetchedStudents = [];
         let totalScore = 0;
-        querySnapshot.forEach((doc) => {
-          const data = { id: doc.id, ...doc.data() };
+        querySnapshot.forEach((docSnap) => {
+          const data = { id: docSnap.id, ...docSnap.data() };
           fetchedStudents.push(data);
-          const perf = data.performance || {};
-          totalScore += perf.overallScore || 0;
+
+          // Compute performance on-the-fly (same logic as Student Dashboard)
+          const codingMap = data.codingProgress || {};
+          let earnedWeight = 0;
+          let solvedCount = 0;
+          Object.keys(codingMap).forEach(probId => {
+            if (codingMap[probId]?.solved) {
+              const level = problemLevels[probId] || 'Easy';
+              earnedWeight += diffWeight[level] || 1;
+              solvedCount++;
+            }
+          });
+          const codingScore = totalPossibleWeight > 0 ? Math.floor((earnedWeight / totalPossibleWeight) * 100) : 0;
+          const aptScore = data.performance?.aptitudeScore || 0;
+          const intScore = data.latestMockInterview?.score || data.performance?.interviewScore || 0;
+          const atsScore = data.performance?.atsScore || 0;
+          const overScore = Math.floor((codingScore + aptScore + intScore + atsScore) / 4);
+
+          totalScore += overScore;
         });
         setStudents(fetchedStudents);
         setAvgStudentScore(fetchedStudents.length > 0 ? Math.floor(totalScore / fetchedStudents.length) : 0);
-
-        // Fetch total coding problems
-        const problemsSnap = await getDocs(collection(db, "problems"));
-        setTotalProblems(problemsSnap.size);
 
         // Fetch total aptitude questions
         const aptitudeSnap = await getDocs(collection(db, "aptitude_questions"));

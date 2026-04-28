@@ -146,6 +146,43 @@
   transform: scale(1.1) rotate(15deg);
 }
 
+/* Student Dashboard Grid Layouts */
+.dash-grid-top {
+  grid-template-columns: minmax(280px, 1.2fr) repeat(4, 1fr);
+}
+
+.dash-grid-mid {
+  grid-template-columns: 1fr 1fr;
+  min-height: 350px;
+}
+
+.dash-grid-bot {
+  grid-template-columns: 1.5fr 1fr 1.5fr;
+  min-height: 320px;
+}
+
+.dash-grid-actions {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Medium screen breakpoint */
+@media (max-width: 1200px) {
+  .dash-grid-top {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .dash-grid-mid {
+    grid-template-columns: 1fr !important;
+    min-height: auto !important;
+  }
+  .dash-grid-bot {
+    grid-template-columns: 1fr !important;
+    min-height: auto !important;
+  }
+  .dash-grid-actions {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
 /* Responsive Matrix layout for MockInterview */
 @media (max-width: 768px) {
   .mock-interview-layout {
@@ -279,6 +316,9 @@
   .dash-grid-bot {
      grid-template-columns: 1fr !important;
      height: auto !important;
+  }
+  .dash-grid-actions {
+     grid-template-columns: 1fr !important;
   }
   
   /* Fix heading scales */

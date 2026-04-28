@@ -281,7 +281,7 @@ const CodingPractice = () => {
   }
 
   return (
-    <div className="coding-split-wrapper" style={{ display: 'flex', gap: '1rem', height: 'calc(100vh - 120px)', width: '100%' }}>
+    <div className="coding-split-wrapper" style={{ display: 'flex', gap: '1rem', height: '100%', width: '100%', overflow: 'hidden' }}>
       
       {/* ⬅ LEFT PANE: Description */}
       <div className="glass-panel coding-pane" style={{ width: '35%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>

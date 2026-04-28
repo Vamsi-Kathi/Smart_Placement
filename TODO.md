@@ -1,36 +1,31 @@
-# Admin Enhancements Plan
+# Comprehensive Fix Plan
 
-## Tasks
-- [x] 1. UserManagement.jsx — Add Student Details Modal with Profile + Stats tabs
-- [x] 2. Admin/Dashboard.jsx — Replace static metrics with real DB stats
-- [x] 3. Admin/CodingSetter.jsx — Dynamic Add/Remove Hidden Test Cases
-- [x] 4. Admin/AptitudeSetter.jsx — Bulk Batch Entry (20 questions, 4 sections)
+## Issues to Fix
+- [x] **Crash on Save** - `TypeError: Cannot read properties of undefined (reading 'Easy')`
+- [x] **Signup data not showing** - AuthModal saves wrong profile structure
+- [x] **Hardcoded TopBar** - App.jsx shows fake names/initials
+- [x] **Admin metrics broken** - Performance never saved to Firestore
+- [x] **UI alignment** - Grid layouts break on different screens
+- [x] **Database seeding** - Need seed script for demo data
 
-## Details
+## Files Edited
+1. `src/components/Student/Dashboard.jsx` - Fixed crash (safe level fallback), preserved performance on save, removed inline grid styles for CSS-controlled responsiveness
+2. `src/components/Public/AuthModal.jsx` - Added separate `course` and `mobile` fields, fixed Firestore save structure
+3. `src/App.jsx` - TopBar now fetches real user profile from Firestore, computes initials dynamically
+4. `src/components/Admin/Dashboard.jsx` - Computes student performance on-the-fly using codingProgress + problem difficulty weights
+5. `src/App.css` - Added `.dash-grid-*` classes with desktop + tablet + mobile breakpoints
+6. `scripts/seedMaster.js` - Created master seed script with demo users, coding problems, aptitude questions, and job postings
 
-### Task 1: UserManagement.jsx
-- Add `selectedStudent` state and modal overlay
-- Fetch student-specific data on row click
-- Profile Tab: name, email, degree, year, language, career goal, weakness
-- Stats Tab: Coding Score, Aptitude Score, Interview Score, ATS Score, Overall Readiness
-- Add "View" icon in Actions column
+## Progress
+- [x] Step 1: Fix Student Dashboard (crash + UI)
+- [x] Step 2: Fix AuthModal (signup structure)
+- [x] Step 3: Fix App.jsx (TopBar hardcoded values)
+- [x] Step 4: Fix Admin Dashboard (metrics)
+- [x] Step 5: Fix App.css (responsive grids)
+- [x] Step 6: Create seedMaster.js
 
-### Task 2: Admin/Dashboard.jsx
-- Fetch `problems` and `aptitude_questions` collections
-- Replace metrics:
-  - "Platform Status: Live" → "Total Coding Problems"
-  - "Database Connection: Connected" → "Total Aptitude Questions"
-  - Add "Avg Student Score"
-
-### Task 3: Admin/CodingSetter.jsx
-- Replace single hidden case with `hiddenCases` array state
-- Add "Add Hidden Test Case" button
-- Add "Remove" button per hidden case
-- Submit all non-empty hidden cases
-
-### Task 4: Admin/AptitudeSetter.jsx
-- Redesign to batch builder with section tabs
-- Sections: Logical, Reasoning, Grammar, Mathematics (5 each)
-- Section progress counter
-- "Deploy Full Batch" button with Promise.all
-
+## How to Run Seed Script
+```bash
+node scripts/seedMaster.js
+```
+Requires `.env.local` with `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_PROJECT_ID`.

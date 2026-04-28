@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { AppProvider, useAppContext } from './context/AppContext';
 import { LayoutDashboard, Code, BookOpen, Mic, FileText, Briefcase, Users, LogOut, Database } from 'lucide-react';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from './firebase';
 import './App.css';
 
 // Public Components
@@ -85,17 +87,47 @@ const Sidebar = () => {
 
 // Topbar for Dashboard
 const TopBar = () => {
-  const { mockStudentData, userRole } = useAppContext();
+  const { currentUser, userRole } = useAppContext();
+  const [displayName, setDisplayName] = useState('');
+
+  useEffect(() => {
+    const fetchName = async () => {
+      if (!currentUser?.uid) return;
+      if (userRole === 'admin') {
+        setDisplayName(currentUser.displayName || 'System Admin');
+        return;
+      }
+      try {
+        const snap = await getDoc(doc(db, "users", currentUser.uid));
+        if (snap.exists()) {
+          setDisplayName(snap.data().name || currentUser.displayName || 'Student');
+        } else {
+          setDisplayName(currentUser.displayName || 'Student');
+        }
+      } catch (e) {
+        setDisplayName(currentUser.displayName || 'Student');
+      }
+    };
+    fetchName();
+  }, [currentUser, userRole]);
+
+  const getInitials = (name) => {
+    if (!name) return userRole === 'admin' ? 'AD' : 'ST';
+    const parts = name.split(' ').filter(Boolean);
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  };
+
   return (
     <div className="top-bar">
       <h2 className="heading-sm">{userRole === 'admin' ? 'Administrator Panel' : 'Student Portal'}</h2>
       <div className="user-profile">
         <div className="text-body" style={{ textAlign: 'right', marginLeft: '1rem' }}>
-          <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{userRole === 'admin' ? 'Admin User' : mockStudentData.name}</div>
+          <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{displayName}</div>
           <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{userRole === 'admin' ? 'System Maintainer' : 'Premium Student'}</div>
         </div>
         <div className="avatar">
-           {userRole === 'admin' ? 'AD' : 'AJ'}
+           {getInitials(displayName)}
         </div>
       </div>
     </div>

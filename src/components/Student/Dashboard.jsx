@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import { db } from '../../firebase';
-import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { 
   Radar, RadarChart, PolarGrid, PolarAngleAxis, 
@@ -9,7 +9,7 @@ import {
   LineChart, Line, AreaChart, Area,
   PieChart, Pie, Cell
 } from 'recharts';
-import { Code2, BookOpen, Mic, Briefcase, ChevronRight } from 'lucide-react';
+import { Code2, BookOpen, Mic, Briefcase, ChevronRight, User, X, CheckCircle2 } from 'lucide-react';
 
 const CircularProgress = ({ value, color, bottomText, subText }) => {
   const data = [{ value }, { value: 100 - value }];
@@ -63,6 +63,12 @@ const StudentDashboard = () => {
   const navigate = useNavigate();
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: '', mobile: '', degree: '', course: '', year: '',
+    primaryLanguage: '', careerGoal: '', targetCompany: '', weakness: ''
+  });
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   useEffect(() => {
     const fetchStudentData = async () => {
@@ -94,13 +100,14 @@ const StudentDashboard = () => {
 
         probsSnap.docs.forEach(doc => {
            const pData = doc.data();
-           const weight = diffWeight[pData.level] || 1;
+           const safeLevel = pData.level || 'Easy';
+           const weight = diffWeight[safeLevel] || 1;
            totalPossibleWeight += weight;
            
            if (codingMap[doc.id]?.solved) {
               earnedWeight += weight;
               solvedCount++;
-              difficultyDist[pData.level] = (difficultyDist[pData.level] || 0) + 1;
+              difficultyDist[safeLevel] = (difficultyDist[safeLevel] || 0) + 1;
            }
         });
         
@@ -137,6 +144,62 @@ const StudentDashboard = () => {
     };
     fetchStudentData();
   }, [currentUser]);
+
+  useEffect(() => {
+    if (profileData) {
+      setEditForm({
+        name: profileData.name || '',
+        mobile: profileData.mobile || '',
+        degree: profileData.profile?.degree || '',
+        course: profileData.profile?.course || '',
+        year: profileData.profile?.year || '',
+        primaryLanguage: profileData.profile?.primaryLanguage || '',
+        careerGoal: profileData.profile?.careerGoal || '',
+        targetCompany: profileData.profile?.targetCompany || '',
+        weakness: profileData.profile?.weakness || ''
+      });
+    }
+  }, [profileData]);
+
+  const handleSaveProfile = async () => {
+    if (!currentUser?.uid || currentUser.uid === 'admin-bypass') return;
+    try {
+      await setDoc(doc(db, "users", currentUser.uid), {
+        name: editForm.name,
+        mobile: editForm.mobile,
+        profile: {
+          degree: editForm.degree,
+          course: editForm.course,
+          year: editForm.year,
+          primaryLanguage: editForm.primaryLanguage,
+          careerGoal: editForm.careerGoal,
+          targetCompany: editForm.targetCompany,
+          weakness: editForm.weakness
+        }
+      }, { merge: true });
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+      
+      // Refresh data from Firestore
+      const refreshed = await getDoc(doc(db, "users", currentUser.uid));
+      if (refreshed.exists()) {
+        const refreshedData = refreshed.data();
+        // Preserve locally computed performance data since it's not in Firestore
+        setProfileData(prev => ({
+          ...prev,
+          ...refreshedData,
+          performance: {
+            ...(refreshedData?.performance || {}),
+            ...(prev?.performance || {}),
+            difficultyDist: prev?.performance?.difficultyDist || refreshedData?.performance?.difficultyDist || { 'Easy': 0, 'Medium': 0, 'Hard': 0, 'Hard Core': 0, 'Expert': 0 }
+          }
+        }));
+      }
+    } catch (err) {
+      console.error("Failed to save profile:", err);
+      alert("Failed to save profile. Check console.");
+    }
+  };
 
   if (loading) {
     return <div style={{ display: 'flex', justifyContent: 'center', padding: '5rem' }}><div className="spinner" style={{ width: 40, height: 40 }}></div></div>;
@@ -178,16 +241,82 @@ const StudentDashboard = () => {
   ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '1400px', margin: '0 auto', color: 'var(--text-primary)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', color: 'var(--text-primary)' }}>
       
       {/* Welcome Banner */}
-      <div style={{ marginBottom: '0.5rem' }}>
-        <h1 className="heading-ld" style={{ fontSize: '2rem', fontWeight: 800 }}>Welcome back, {safeName.split(' ')[0]} 👋</h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.25rem' }}>Your placement journey dashboard — keep it up!</p>
+      <div style={{ marginBottom: '0.5rem', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+        <div>
+          <h1 className="heading-ld" style={{ fontSize: '2rem', fontWeight: 800 }}>Welcome back, {safeName.split(' ')[0]} 👋</h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.25rem' }}>Your placement journey dashboard — keep it up!</p>
+        </div>
+        <button 
+          onClick={() => setShowEditModal(true)}
+          className="btn-secondary"
+          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.2rem', fontSize: '0.9rem', fontWeight: 600 }}
+        >
+          <User size={16} />
+          Edit Profile
+        </button>
+      </div>
+
+      {/* PROFILE INFO CARD */}
+      <div className="glass-panel" style={{ padding: '1.5rem', marginBottom: '0.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ 
+              width: 56, height: 56, borderRadius: '50%', 
+              background: 'var(--accent-primary)', 
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '1.5rem', fontWeight: 800, color: '#fff'
+            }}>
+              {(profileData?.name || 'S').charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}>{profileData?.name || 'Student'}</h2>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
+                {profileData?.profile?.degree || 'Degree not set'} • {profileData?.profile?.course || 'Course not set'} • {profileData?.profile?.year || 'Year not set'}
+              </p>
+            </div>
+          </div>
+          <button 
+            onClick={() => setShowEditModal(true)}
+            className="btn-secondary"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.2rem', fontSize: '0.9rem', fontWeight: 600 }}
+          >
+            <User size={16} />
+            Edit Profile
+          </button>
+        </div>
+        
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+          gap: '1rem', 
+          marginTop: '1.5rem',
+          paddingTop: '1.5rem',
+          borderTop: '1px solid var(--panel-border)'
+        }}>
+          <div>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Mobile</p>
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: 500, marginTop: '0.25rem' }}>{profileData?.mobile || 'Not set'}</p>
+          </div>
+          <div>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Career Goal</p>
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: 500, marginTop: '0.25rem' }}>{profileData?.profile?.careerGoal || 'Not set'}</p>
+          </div>
+          <div>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Primary Language</p>
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: 500, marginTop: '0.25rem' }}>{profileData?.profile?.primaryLanguage || 'Not set'}</p>
+          </div>
+          <div>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Target Company</p>
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: 500, marginTop: '0.25rem' }}>{profileData?.profile?.targetCompany || 'Not set'}</p>
+          </div>
+        </div>
       </div>
 
       {/* TOP ROW: Global Metrics */}
-      <div className="dash-grid-top" style={{ display: 'grid', gridTemplateColumns: 'minmax(280px, 1.2fr) repeat(4, 1fr)', gap: '1.5rem' }}>
+      <div className="dash-grid-top" style={{ display: 'grid', gap: '1.5rem' }}>
          
          <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
             <h3 style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: '0.05em', textTransform: 'uppercase', textAlign: 'center', marginBottom: '1rem' }}>Placement Readiness</h3>
@@ -208,7 +337,7 @@ const StudentDashboard = () => {
       </div>
 
       {/* MIDDLE ROW: Deep Analytics */}
-      <div className="dash-grid-mid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', height: '350px' }}>
+      <div className="dash-grid-mid" style={{ display: 'grid', gap: '1.5rem' }}>
          <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
                <div>
@@ -255,7 +384,7 @@ const StudentDashboard = () => {
       </div>
 
       {/* BOTTOM ROW: Skill Radar & ATS */}
-      <div className="dash-grid-bot" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1.5fr', gap: '1.5rem', height: '320px' }}>
+      <div className="dash-grid-bot" style={{ display: 'grid', gap: '1.5rem' }}>
          <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                <div>
@@ -309,7 +438,7 @@ const StudentDashboard = () => {
       </div>
 
       {/* ACTION ROW */}
-      <div className="dash-grid-top" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', margin: '1rem 0 2rem' }}>
+      <div className="dash-grid-actions" style={{ display: 'grid', gap: '1.5rem', margin: '1rem 0 2rem' }}>
           {[
             { t: 'Solve a Problem', sub: 'Coding Practice', route: '/dashboard/coding', icon: <Code2 size={16}/>, color: 'var(--accent-secondary)' },
             { t: 'Take Aptitude Test', sub: 'Multiple Types', route: '/dashboard/aptitude', icon: <BookOpen size={16}/>, color: 'var(--accent-secondary)' },
@@ -330,6 +459,89 @@ const StudentDashboard = () => {
              </div>
           ))}
       </div>
+
+      {/* EDIT PROFILE MODAL */}
+      {showEditModal && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)',
+          zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: '2rem'
+        }}>
+          <div className="glass-panel" style={{
+            width: '100%', maxWidth: '600px', maxHeight: '90vh',
+            overflowY: 'auto', padding: '2rem', position: 'relative'
+          }}>
+            <button 
+              onClick={() => setShowEditModal(false)}
+              style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
+            >
+              <X size={20} />
+            </button>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>Edit Profile</h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '2rem' }}>Update your personal and academic information</p>
+            {saveSuccess && (
+              <div style={{ 
+                display: 'flex', alignItems: 'center', gap: '0.5rem', 
+                padding: '1rem', background: 'rgba(16, 185, 129, 0.1)', 
+                borderRadius: '8px', color: 'var(--success)', marginBottom: '1.5rem', fontWeight: 600 
+              }}>
+                <CheckCircle2 size={18} />
+                Profile saved successfully!
+              </div>
+            )}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Full Name</label>
+                <input type="text" value={editForm.name} onChange={(e) => setEditForm({...editForm, name: e.target.value})} style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--panel-border)', borderRadius: '8px', color: 'var(--text-primary)' }} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Mobile</label>
+                <input type="text" value={editForm.mobile} onChange={(e) => setEditForm({...editForm, mobile: e.target.value})} style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--panel-border)', borderRadius: '8px', color: 'var(--text-primary)' }} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Degree</label>
+                <input type="text" value={editForm.degree} placeholder="e.g. B.Tech" onChange={(e) => setEditForm({...editForm, degree: e.target.value})} style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--panel-border)', borderRadius: '8px', color: 'var(--text-primary)' }} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Course</label>
+                <input type="text" value={editForm.course} placeholder="e.g. CSE" onChange={(e) => setEditForm({...editForm, course: e.target.value})} style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--panel-border)', borderRadius: '8px', color: 'var(--text-primary)' }} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Year</label>
+                <select value={editForm.year} onChange={(e) => setEditForm({...editForm, year: e.target.value})} style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--panel-border)', borderRadius: '8px', color: 'var(--text-primary)' }}>
+                  <option value="">Select Year</option>
+                  <option value="1st Year">1st Year</option>
+                  <option value="2nd Year">2nd Year</option>
+                  <option value="3rd Year">3rd Year</option>
+                  <option value="4th Year">4th Year</option>
+                  <option value="Graduated">Graduated</option>
+                </select>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Primary Language</label>
+                <input type="text" value={editForm.primaryLanguage} placeholder="e.g. Python, Java" onChange={(e) => setEditForm({...editForm, primaryLanguage: e.target.value})} style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--panel-border)', borderRadius: '8px', color: 'var(--text-primary)' }} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Career Goal</label>
+                <input type="text" value={editForm.careerGoal} placeholder="e.g. Full Stack Developer" onChange={(e) => setEditForm({...editForm, careerGoal: e.target.value})} style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--panel-border)', borderRadius: '8px', color: 'var(--text-primary)' }} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Target Company</label>
+                <input type="text" value={editForm.targetCompany} placeholder="e.g. Google, Amazon" onChange={(e) => setEditForm({...editForm, targetCompany: e.target.value})} style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--panel-border)', borderRadius: '8px', color: 'var(--text-primary)' }} />
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', gridColumn: '1 / -1' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)' }}>Weakness</label>
+                <input type="text" value={editForm.weakness} placeholder="e.g. Data Structures, System Design" onChange={(e) => setEditForm({...editForm, weakness: e.target.value})} style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--panel-border)', borderRadius: '8px', color: 'var(--text-primary)' }} />
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+              <button onClick={() => setShowEditModal(false)} className="btn-secondary" style={{ flex: 1, padding: '0.75rem' }}>Cancel</button>
+              <button onClick={handleSaveProfile} className="btn-primary" style={{ flex: 1, padding: '0.75rem' }}>Save Changes</button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

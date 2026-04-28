@@ -18,12 +18,14 @@ const AuthModal = ({ isOpen, onClose }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState('');
   
-  const [degree, setDegree] = useState('B.Tech Computer Science');
+  const [degree, setDegree] = useState('B.Tech');
+  const [course, setCourse] = useState('Computer Science');
+  const [mobile, setMobile] = useState('');
   const [year, setYear] = useState('3rd Year');
   const [primaryLanguage, setPrimaryLanguage] = useState('Python');
-  const careerGoal = 'Full Stack Developer';
-  const weakness = 'Data Structures & Algorithms';
-  const targetCompany = 'Product Based (FAANG/Top Tech)';
+  const [careerGoal, setCareerGoal] = useState('Full Stack Developer');
+  const [weakness, setWeakness] = useState('Data Structures & Algorithms');
+  const [targetCompany, setTargetCompany] = useState('Google / FAANG');
 
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -53,8 +55,9 @@ const AuthModal = ({ isOpen, onClose }) => {
           await setDoc(doc(db, "users", user.uid), {
             name: name || 'User',
             email: user.email,
+            mobile: mobile || '',
             role: 'student', 
-            profile: { degree, year, primaryLanguage, careerGoal, weakness, targetCompany },
+            profile: { degree, course, year, primaryLanguage, careerGoal, weakness, targetCompany },
             createdAt: new Date().toISOString()
           });
         } catch (dbError) {
@@ -151,13 +154,26 @@ const AuthModal = ({ isOpen, onClose }) => {
                       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                         <span className="text-body" style={{ fontSize: '0.85rem' }}>Degree</span>
                         <select value={degree} onChange={(e) => setDegree(e.target.value)} style={{ width: '100%', padding: '0.875rem 0.5rem', borderRadius: 'var(--radius-md)', outline: 'none', background: 'var(--panel-bg)', color: 'var(--text-primary)', border: '1px solid var(--panel-border)', fontSize: '0.9rem', minWidth: '0' }}>
-                          <option value="B.Tech Computer Science">B.Tech CS</option>
-                          <option value="B.Tech IT">B.Tech IT</option>
+                          <option value="B.Tech">B.Tech</option>
                           <option value="BCA">BCA</option>
                           <option value="MCA">MCA</option>
                           <option value="Other">Other</option>
                         </select>
                       </div>
+                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                        <span className="text-body" style={{ fontSize: '0.85rem' }}>Course</span>
+                        <select value={course} onChange={(e) => setCourse(e.target.value)} style={{ width: '100%', padding: '0.875rem 0.5rem', borderRadius: 'var(--radius-md)', outline: 'none', background: 'var(--panel-bg)', color: 'var(--text-primary)', border: '1px solid var(--panel-border)', fontSize: '0.9rem', minWidth: '0' }}>
+                          <option value="Computer Science">Computer Science</option>
+                          <option value="Information Technology">Information Technology</option>
+                          <option value="ECE">ECE</option>
+                          <option value="Mechanical">Mechanical</option>
+                          <option value="Civil">Civil</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '1rem' }}>
                       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                         <span className="text-body" style={{ fontSize: '0.85rem' }}>Year</span>
                         <select value={year} onChange={(e) => setYear(e.target.value)} style={{ width: '100%', padding: '0.875rem 0.5rem', borderRadius: 'var(--radius-md)', outline: 'none', background: 'var(--panel-bg)', color: 'var(--text-primary)', border: '1px solid var(--panel-border)', fontSize: '0.9rem', minWidth: '0' }}>
@@ -167,6 +183,10 @@ const AuthModal = ({ isOpen, onClose }) => {
                           <option value="4th Year">4th Year</option>
                           <option value="Graduated">Graduated</option>
                         </select>
+                      </div>
+                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                        <span className="text-body" style={{ fontSize: '0.85rem' }}>Mobile</span>
+                        <input type="tel" placeholder="+91 98765 43210" value={mobile} onChange={(e) => setMobile(e.target.value)} style={{ width: '100%', padding: '0.875rem 1rem', borderRadius: 'var(--radius-md)', outline: 'none', background: 'var(--panel-bg)', color: 'var(--text-primary)', border: '1px solid var(--panel-border)' }} />
                       </div>
                     </div>
 

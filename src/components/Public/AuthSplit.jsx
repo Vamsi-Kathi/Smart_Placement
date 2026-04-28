@@ -27,6 +27,7 @@ const AuthSplit = () => {
   const [mobile, setMobile] = useState('');
   
   const [degree, setDegree] = useState('B.Tech Computer Science');
+  const [course, setCourse] = useState('');
   const [year, setYear] = useState('3rd Year');
 
   const [error, setError] = useState(null);
@@ -63,7 +64,7 @@ const AuthSplit = () => {
             email: user.email,
             mobile: mobile,
             role: 'student', 
-            profile: { degree, year },
+            profile: { degree, course, year },
             createdAt: new Date().toISOString()
           });
         } catch (dbError) {
@@ -176,7 +177,7 @@ const AuthSplit = () => {
                             </div>
                             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                 <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>Course/Branch</span>
-                                <input placeholder="Enter the Course" style={{ padding: '0.875rem 1rem' }} />
+                                <input value={course} onChange={e => setCourse(e.target.value)} placeholder="Enter the Course" style={{ padding: '0.875rem 1rem' }} />
                             </div>
                         </div>
 
